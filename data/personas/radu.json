@@ -1,0 +1,46 @@
+{
+  "id": "radu",
+  "name": "Radu",
+  "age": 22,
+  "yearsWorked": 1,
+  "salaryBani": 320000,
+  "pillarTwoBani": 150000,
+  "risk": "low",
+  "roundUpRule": {
+    "stepBani": 500,
+    "multiplier": 1
+  },
+  "monthlyCapBani": 20000,
+  "expectedDaysOfFreedom": {
+    "pessimistic": 75,
+    "base": 84,
+    "optimistic": 95
+  },
+  "sampleTransactions": [
+    {
+      "transactionId": "tx-radu-001",
+      "bookingDate": "2026-10-27",
+      "transactionAmount": {
+        "amount": "-6.00",
+        "currency": "RON"
+      },
+      "creditorName": "Metrorex",
+      "remittanceInformationUnstructured": "Metrou calatorie",
+      "expectedSpentBani": 600,
+      "expectedRoundUpBani": 400
+    },
+    {
+      "transactionId": "tx-radu-002",
+      "bookingDate": "2026-10-27",
+      "transactionAmount": {
+        "amount": "-4.50",
+        "currency": "RON"
+      },
+      "creditorName": "Inmedio",
+      "remittanceInformationUnstructured": "Apa plata",
+      "expectedSpentBani": 450,
+      "expectedRoundUpBani": 50
+    }
+  ]
+}
+
