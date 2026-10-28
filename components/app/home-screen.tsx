@@ -23,7 +23,7 @@ export function HomeScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab)
         <p className="mt-1 text-sm text-[#d9d2f5]">of retirement your private savings already pay for</p>
         {freedom.daysFromApp > 0 && (
           <span className="mt-4 inline-flex rounded-full bg-[#bfe8d1] px-3 py-1 text-xs font-semibold text-[#236243]">
-            +{formatFreedom(freedom.daysFromApp)} with zile.
+            + {formatFreedom(freedom.daysFromApp)} with zile.
           </span>
         )}
       </Card>

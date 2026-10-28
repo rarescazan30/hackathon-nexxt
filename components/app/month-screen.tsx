@@ -4,7 +4,7 @@
 // the history of past months (collected → with our partner → invested).
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Check, Clock3, FastForward, Sparkles } from 'lucide-react'
+import { CalendarDays, Check, Clock3, FastForward, Sparkles } from 'lucide-react'
 import { formatFreedom, formatRon } from '@/lib/rules/lifestyle'
 import type { AppData, JarSummary } from '@/lib/data/app-data'
 import { answerMonthlyOffer, simulateMonthEnd } from '@/app/app/actions'
@@ -52,7 +52,7 @@ function OfferCard({ jar }: { jar: JarSummary }) {
         ) : (
           <p className="mt-1 text-[28px] font-semibold tracking-[-.03em]">{formatRon(jar.totalBani, { wholeRon: true })}</p>
         )}
-        <p className="mt-1 text-xs font-semibold text-[#438565] dark:text-[#6bc495]">+{formatFreedom(jar.daysAdded)} of freedom</p>
+        <p className="mt-1 text-xs font-semibold text-[#438565] dark:text-[#6bc495]">+ {formatFreedom(jar.daysAdded)} of freedom</p>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -120,7 +120,12 @@ function CurrentMonth({ jar }: { jar: JarSummary }) {
   const line = statusLine(jar)
   return (
     <Card>
-      <p className="text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{monthName(jar.month)}</p>
+      <div className="flex items-center gap-2.5">
+        <div className="flex size-8 items-center justify-center rounded-xl bg-[#f1effa] text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
+          <CalendarDays size={17} />
+        </div>
+        <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#8c7ad9]">{monthName(jar.month)}</p>
+      </div>
       <p className="mt-1 text-[28px] font-semibold tracking-[-.03em]">{formatRon(jar.acceptedAmountBani ?? jar.totalBani)}</p>
       {answered ? (
         <p className={`mt-1 flex items-center gap-1.5 text-sm font-medium ${line.tone}`}>
@@ -173,7 +178,12 @@ export function MonthScreen({ data }: { data: AppData }) {
 
       {history.length > 0 && (
         <Card>
-          <p className="mb-3 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Past months</p>
+          <div className="mb-3.5 flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-[#f1effa] text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
+              <CalendarDays size={14} />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#8c7ad9]">Past months</p>
+          </div>
           <ul className="divide-y divide-dashed divide-[#e2dfe8] dark:divide-[#353042]">
             {history.map((jar) => {
               const line = statusLine(jar)
@@ -187,7 +197,7 @@ export function MonthScreen({ data }: { data: AppData }) {
                   </div>
                   <div className="text-right">
                     <p className="font-semibold">{jar.acceptedAmountBani ? formatRon(jar.acceptedAmountBani, { wholeRon: true }) : '—'}</p>
-                    {jar.acceptedAmountBani ? <p className="text-xs text-[#438565] dark:text-[#6bc495]">+{formatFreedom(jar.daysAdded)}</p> : null}
+                    {jar.acceptedAmountBani ? <p className="text-xs text-[#438565] dark:text-[#6bc495]">+ {formatFreedom(jar.daysAdded)}</p> : null}
                   </div>
                 </li>
               )

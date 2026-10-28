@@ -33,7 +33,7 @@ const SLOT_MODELS = { home: Home, transport: Transport, food: Food, extras: Extr
 const IDLE_TURN_SPEED = 0.12 // radians per second
 const POP_SECONDS = 0.7
 const SPARKLE_SECONDS = 1.4
-const CAMERA_FIT = 8.6 // world units that fit across the smaller side of the canvas
+const CAMERA_FIT = 6.8 // world units that fit across the smaller side of the canvas
 
 /** easeOutBack: overshoots a little, then settles at 1. */
 function popScale(t: number) {

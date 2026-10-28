@@ -4,4 +4,39 @@ import { type Tab } from '@/components/app/types'
 export function Logo() { return <div className="flex items-center gap-2"><div className="flex size-8 items-center justify-center rounded-xl bg-[#33256c] text-white"><PiggyBank size={17} /></div><span className="font-semibold tracking-[-.02em]">zile<span className="text-[#8c7ad9]">.</span></span></div> }
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <section className={`rounded-[24px] border border-black/[.06] bg-white p-5 shadow-[0_12px_35px_rgba(49,37,108,.06)] dark:border-white/10 dark:bg-[#211d2b] ${className}`}>{children}</section> }
 export function Header({ title, subtitle, onMenu }: { title: string; subtitle?: string; onMenu?: () => void }) { return <header className="flex items-center justify-between px-1 pb-6"><div><p className="mb-1 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{subtitle || 'Your retirement'}</p><h1 className="text-[27px] font-semibold tracking-[-.04em]">{title}</h1></div>{onMenu && <button aria-label="Open menu" onClick={onMenu} className="flex size-11 items-center justify-center rounded-full bg-white text-[#33256c] shadow-sm dark:bg-[#292333] dark:text-white"><Menu size={19} /></button>}</header> }
-export function BottomNav({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) { const items = [{ id: 'home' as Tab, label: 'Home', icon: Home }, { id: 'month' as Tab, label: 'Month', icon: CalendarDays }, { id: 'profile' as Tab, label: 'Profile', icon: UserRound }]; return <nav className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 justify-around border-t border-black/[.06] bg-white/90 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#18151f]/90">{items.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => setTab(id)} className={`flex min-w-[68px] flex-col items-center gap-1 text-[11px] font-medium transition-colors ${tab === id ? 'text-[#5f4bb6]' : 'text-[#9893a4]'}`}><Icon size={20} strokeWidth={tab === id ? 2.5 : 1.8} /><span>{label}</span></button>)}</nav> }
+export function BottomNav({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+  const items = [
+    { id: 'home' as Tab, label: 'Home', icon: Home },
+    { id: 'month' as Tab, label: 'Month', icon: CalendarDays },
+    { id: 'profile' as Tab, label: 'Profile', icon: UserRound },
+  ]
+  return (
+    <nav className="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[430px] -translate-x-1/2 justify-around border-t border-black/[.06] bg-white/95 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] pt-2.5 backdrop-blur-xl dark:border-white/10 dark:bg-[#18151f]/95">
+      {items.map(({ id, label, icon: Icon }) => {
+        const isActive = tab === id
+        return (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`flex min-w-[76px] flex-col items-center gap-1 rounded-2xl py-1 text-xs font-medium transition-all ${
+              isActive
+                ? 'scale-105 font-semibold text-[#5f4bb6] dark:text-[#a594f0]'
+                : 'text-[#8b8598] hover:text-[#5f4bb6] dark:text-[#9e97ab]'
+            }`}
+          >
+            <div
+              className={`flex items-center justify-center rounded-xl p-1.5 transition-colors ${
+                isActive
+                  ? 'bg-[#ede8fb] text-[#5f4bb6] dark:bg-[#2d2543] dark:text-[#a594f0]'
+                  : ''
+              }`}
+            >
+              <Icon size={isActive ? 23 : 21} strokeWidth={isActive ? 2.5 : 1.9} />
+            </div>
+            <span>{label}</span>
+          </button>
+        )
+      })}
+    </nav>
+  )
+}
