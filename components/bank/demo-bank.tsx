@@ -12,8 +12,8 @@ import { PRIMARY_BUTTON } from '@/components/onboarding/onboarding-state'
 
 export const OPEN_BANKING = 'Open Banking (demo)'
 
-// Fictional banks: no real bank names or logos in the demo.
-const BANKS = ['Demo Bank', 'Nova Bank', 'Danube Bank']
+// The one PSD2 provider in the demo: a fictional bank, no real bank names or logos.
+const BANKS = ['Demo Bank']
 const CODE_LENGTH = 4
 
 // Fixed light colours, like the Stripe card sheet.

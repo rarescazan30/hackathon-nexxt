@@ -247,3 +247,14 @@ export async function connectCard(choice: BankChoice) {
   await rebuildOpenMonth(userId)
   refresh()
 }
+
+/**
+ * Profile → Open Banking → "Disconnect" (e.g. to connect another card). Stops reading new
+ * payments; the ones already read stay in the history (past months depend on them).
+ */
+export async function disconnectBank() {
+  const userId = await requireUserId()
+  const supabase = await createClient()
+  unwrap(await supabase.from('profiles').update({ card_linked: false, bank_name: null, bank_card_last4: null }).eq('id', userId))
+  refresh()
+}

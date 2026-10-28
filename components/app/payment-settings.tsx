@@ -6,7 +6,7 @@
 import { useState, useTransition } from 'react'
 import { CreditCard, Landmark } from 'lucide-react'
 import type { AppData } from '@/lib/data/app-data'
-import { connectCard } from '@/app/app/actions'
+import { connectCard, disconnectBank } from '@/app/app/actions'
 import { removeCard } from '@/app/app/card-actions'
 import { Card } from '@/components/app/shell'
 import { DemoBank, OPEN_BANKING } from '@/components/bank/demo-bank'
@@ -73,7 +73,11 @@ export function PaymentSettings({ settings }: { settings: AppData['settings'] })
       <div>
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className={ROLE}>2 · Reads your payments for round-ups</p>
-          {!settings.cardLinked && (
+          {settings.cardLinked ? (
+            <button onClick={() => startTransition(() => disconnectBank())} disabled={pending} className={ACTION}>
+              {pending ? 'One moment…' : 'Disconnect'}
+            </button>
+          ) : (
             <button onClick={() => setConnectingBank(true)} disabled={pending} className={ACTION}>
               {pending ? 'Connecting…' : 'Connect'}
             </button>
@@ -86,7 +90,9 @@ export function PaymentSettings({ settings }: { settings: AppData['settings'] })
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{settings.bank ? `${settings.bank.name} · card •• ${settings.bank.last4}` : OPEN_BANKING}</p>
             <p className="text-xs text-[#858090] dark:text-[#a39cab]">
-              {settings.cardLinked ? 'Connected · read only, it can’t move money' : 'Connect to see your payments and round-ups'}
+              {settings.cardLinked
+                ? 'Connected · read only, it can’t move money. Disconnect to use another card.'
+                : 'Connect to see your payments and round-ups'}
             </p>
           </div>
         </div>
