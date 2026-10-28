@@ -18,7 +18,7 @@ export function AppShell({ data }: { data: AppData }) {
   }
   const screens = {
     home: <HomeScreen data={data} setTab={setTab} />,
-    month: <MonthScreen data={data} />,
+    month: <MonthScreen data={data} setTab={setTab} />,
     profile: <ProfileScreen data={data} />,
   }
 

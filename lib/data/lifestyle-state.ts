@@ -21,8 +21,10 @@ export interface LifestyleInput {
   birthYear: number | null
   netSalaryBani: number | null
   yearsWorked: number | null
-  assets: { type: string; balance_bani: number }[]
-  jars: { month: string; status: string; accepted_amount_bani: number | null }[]
+  assets: { type: string; balance_bani: number; as_of?: string | null }[]
+  jars: { month: string; status: string; accepted_amount_bani: number | null; invested_at?: string | null }[]
+  /** profiles.start_level: the highest starting level so far (the level never goes down). */
+  storedStartLevel?: number | null
   /** Defaults to the current year. */
   year?: number
 }
@@ -34,7 +36,7 @@ export interface LifestyleNumbers {
   contributions: Contribution[]
   contributedBani: number
   level: LevelState
-  /** Days of retirement covered by all private savings (assets + contributions). */
+  /** Days of retirement covered by all private savings (statements + contributions not in them yet). */
   totalDays: number
   /** The part of totalDays added through the app. */
   daysFromApp: number
@@ -56,13 +58,25 @@ export function lifestyleNumbers(input: LifestyleInput): LifestyleNumbers {
     pillarTwoBani: sumBalances(input.assets, 'pillar2'),
     pillarThreeBani: sumBalances(input.assets, 'pillar3'),
   })
-  const startLevel = firstLevelOfTier(tierFromRatio(income.replacementRatio))
+  // The starting level only goes up: a new statement or a lower salary never takes levels away.
+  const startLevel = Math.max(input.storedStartLevel ?? 0, firstLevelOfTier(tierFromRatio(income.replacementRatio)))
 
   const contributions = input.jars
     .filter((jar) => (CONTRIBUTED_STATUSES as readonly string[]).includes(jar.status))
     .map((jar) => ({ month: jar.month, amountBani: jar.accepted_amount_bani ?? 0 }))
   const contributedBani = contributions.reduce((sum, c) => sum + c.amountBani, 0)
-  const level = levelState(startLevel, xpFromContributions(contributions, salary))
+  const stateRate = income.stateReplacementRate
+  const level = levelState(startLevel, xpFromContributions(contributions, salary, stateRate))
+
+  // Money we already sent to Pillar III shows up in the next Pillar III statement, so a
+  // contribution only adds to the balances if it was invested after the newest one.
+  const newestPillarThree = input.assets
+    .filter((asset) => asset.type === 'pillar3' && asset.as_of)
+    .reduce((newest, asset) => (asset.as_of! > newest ? asset.as_of! : newest), '')
+  const notInStatementBani = input.jars
+    .filter((jar) => (CONTRIBUTED_STATUSES as readonly string[]).includes(jar.status))
+    .filter((jar) => !(jar.status === 'invested' && jar.invested_at && jar.invested_at.slice(0, 10) <= newestPillarThree))
+    .reduce((sum, jar) => sum + (jar.accepted_amount_bani ?? 0), 0)
 
   const assetsBani = input.assets.reduce((sum, asset) => sum + asset.balance_bani, 0)
   return {
@@ -72,7 +86,7 @@ export function lifestyleNumbers(input: LifestyleInput): LifestyleNumbers {
     contributions,
     contributedBani,
     level,
-    totalDays: daysOfFreedomFromSalary(assetsBani + contributedBani, salary).base,
-    daysFromApp: daysAddedFromAmount(contributedBani, salary).base,
+    totalDays: daysOfFreedomFromSalary(assetsBani + notInStatementBani, salary, stateRate).base,
+    daysFromApp: daysAddedFromAmount(contributedBani, salary, stateRate).base,
   }
 }

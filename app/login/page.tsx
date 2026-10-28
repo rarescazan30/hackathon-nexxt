@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { AuthLayout } from '@/components/auth/auth-layout'
-import { DemoButton, OrDivider } from '@/components/auth/demo-button'
 import { LoginForm } from '@/components/auth/login-form'
 
 export const metadata: Metadata = {
@@ -24,8 +23,6 @@ export default function LoginPage() {
       }
     >
       <LoginForm />
-      <OrDivider />
-      <DemoButton />
     </AuthLayout>
   )
 }

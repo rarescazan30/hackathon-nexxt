@@ -43,7 +43,7 @@ export default function TermsPage() {
           <Logo />
         </Link>
         <header className="px-1 pb-2 pt-6">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Terms</p>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Terms</p>
           <h1 className="text-[27px] font-semibold tracking-[-.04em]">Plain-English terms</h1>
           <p className="mt-2 text-sm text-[#706b7b] dark:text-[#aaa4b6]">Hackathon draft. The short version of how zile. works and how it makes money.</p>
         </header>

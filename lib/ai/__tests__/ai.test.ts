@@ -5,16 +5,16 @@ process.env.AI_PROVIDER = "mock";
 
 import { extractStatement, fallbackMonthlyMessage, monthlyOfferMessage, MOCK_EXTRACT } from "../index";
 
-const facts = { firstName: "Andrei", amountBani: 22942, daysAdded: 6, nextUnlock: "Good groceries", levelUpNow: true };
+const facts = { firstName: "Andrei", month: "October", amountBani: 22942, daysAdded: 6, nextUnlock: "Good groceries", levelUpNow: true };
 
 test("fallbackMonthlyMessage: English, real numbers, mentions the unlock on a level-up", () => {
   assert.strictEqual(
     fallbackMonthlyMessage(facts),
-    "Andrei, you saved 229 RON this month. That's +6 days of freedom, enough to unlock good groceries."
+    "Andrei, you saved 229 RON in October. That's +6 days of freedom, enough to unlock good groceries."
   );
   assert.strictEqual(
     fallbackMonthlyMessage({ ...facts, levelUpNow: false }),
-    "Andrei, you saved 229 RON this month. That's +6 days of freedom in retirement."
+    "Andrei, you saved 229 RON in October. That's +6 days of freedom in retirement."
   );
 });
 

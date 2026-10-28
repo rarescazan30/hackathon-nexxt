@@ -2,8 +2,11 @@
 // The screens get this object as props; they never fetch on their own.
 import { redirect } from 'next/navigation'
 import { daysAddedFromAmount, slotUnlockedAt, type LevelState, type RetirementIncome, type Slot } from '@/lib/rules'
+import { isAdminEmail } from '@/lib/server/admin'
 import { createClient } from '@/lib/supabase/server'
 import { lifestyleNumbers } from './lifestyle-state'
+
+const YEAR_MS = 365 * 86_400_000
 
 export interface JarSummary {
   id: string
@@ -20,8 +23,15 @@ export interface JarSummary {
 }
 
 export interface AppData {
-  user: { firstName: string; fullName: string; email: string }
-  settings: { netSalaryBani: number; roundupRuleBani: number; salaryPercentBp: number }
+  user: { firstName: string; fullName: string; email: string; isAdmin: boolean }
+  settings: {
+    netSalaryBani: number
+    birthYear: number | null
+    yearsWorked: number | null
+    roundupRuleBani: number
+    salaryPercentBp: number
+    cardLinked: boolean
+  }
   freedom: { totalDays: number; daysFromApp: number }
   retirement: RetirementIncome
   level: LevelState
@@ -32,6 +42,8 @@ export interface AppData {
   roundups: { id: string; date: string; counterparty: string; spentBani: number; roundupBani: number }[]
   history: JarSummary[]
   pensions: { id: string; type: string; provider: string | null; balanceBani: number; asOf: string }[]
+  /** The newest statement is over a year old: funds have sent a new one by now. */
+  statementIsOld: boolean
   contributedBani: number
 }
 
@@ -62,6 +74,7 @@ export async function getAppData(): Promise<AppDataResult> {
     yearsWorked: profile.years_worked,
     assets,
     jars,
+    storedStartLevel: profile.start_level,
   })
 
   const toSummary = (jar: (typeof jars)[number]): JarSummary => ({
@@ -75,7 +88,7 @@ export async function getAppData(): Promise<AppDataResult> {
     offerMessage: jar.offer_message,
     investOn: jar.invest_on,
     interestBani: jar.float_interest_bani,
-    daysAdded: daysAddedFromAmount(jar.accepted_amount_bani ?? jar.total_bani, salary).base,
+    daysAdded: daysAddedFromAmount(jar.accepted_amount_bani ?? jar.total_bani, salary, numbers.income.stateReplacementRate).base,
   })
   const [current, ...past] = jars
 
@@ -101,8 +114,15 @@ export async function getAppData(): Promise<AppDataResult> {
   return {
     onboardingCompleted: true,
     data: {
-      user: { firstName: fullName.split(' ')[0], fullName, email: auth.user.email ?? '' },
-      settings: { netSalaryBani: salary, roundupRuleBani: profile.roundup_rule_bani, salaryPercentBp: profile.salary_percent_bp },
+      user: { firstName: fullName.split(' ')[0], fullName, email: auth.user.email ?? '', isAdmin: isAdminEmail(auth.user.email) },
+      settings: {
+        netSalaryBani: salary,
+        birthYear: profile.birth_year,
+        yearsWorked: profile.years_worked,
+        roundupRuleBani: profile.roundup_rule_bani,
+        salaryPercentBp: profile.salary_percent_bp,
+        cardLinked: profile.card_linked,
+      },
       freedom: { totalDays: numbers.totalDays, daysFromApp: numbers.daysFromApp },
       retirement: numbers.income,
       level: numbers.level,
@@ -117,6 +137,7 @@ export async function getAppData(): Promise<AppDataResult> {
         balanceBani: asset.balance_bani,
         asOf: asset.as_of,
       })),
+      statementIsOld: assets.length > 0 && Date.parse(assets[0].as_of) < Date.now() - YEAR_MS,
       contributedBani: numbers.contributedBani,
     },
   }

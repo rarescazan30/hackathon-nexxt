@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Placeholder logo: a sun over a little island. Replace this file with the real logo. -->
+  <rect width="64" height="64" rx="16" fill="#33256c"/>
+  <circle cx="32" cy="28" r="10" fill="#bfe8d1"/>
+  <path d="M10 44c6-5 14-7 22-7s16 2 22 7v6H10z" fill="#8c7ad9"/>
+  <path d="M10 48c7-3 14-4 22-4s15 1 22 4v4H10z" fill="#f1effa"/>
+</svg>

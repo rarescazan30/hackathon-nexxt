@@ -1,11 +1,13 @@
 'use client'
 
-// Step 4: round-up rule, salary share, card connection (simulated) and the terms.
+// Step 4: round-up rule, salary share, card connection (through the demo bank) and the terms.
+import { useState } from 'react'
 import Link from 'next/link'
 import { Check, CreditCard } from 'lucide-react'
 import { formatRon, roundUp } from '@/lib/rules'
 import { Card } from '@/components/app/shell'
 import { FormError } from '@/components/auth/form-parts'
+import { DEMO_ACCOUNT, DemoBank } from '@/components/bank/demo-bank'
 import { PRIMARY_BUTTON, type OnboardingDraft } from './onboarding-state'
 
 const ROUNDUP_OPTIONS: { bani: OnboardingDraft['roundupRuleBani']; label: string }[] = [
@@ -24,7 +26,7 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
     <button
       onClick={onClick}
       aria-pressed={selected}
-      className={`rounded-xl py-2.5 text-xs font-semibold ${selected ? 'bg-[#33256c] text-white' : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'}`}
+      className={`pulse-hover rounded-xl py-2.5 text-xs font-semibold ${selected ? 'bg-[#33256c] text-white' : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'}`}
     >
       {children}
     </button>
@@ -33,6 +35,7 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
 
 export function PiggyBankStep({ draft, update, onFinish, pending, error }: { draft: OnboardingDraft; update: (change: Partial<Settings>) => void; onFinish: () => void; pending: boolean; error?: string }) {
   const exampleRoundUp = roundUp(EXAMPLE_PAYMENT_BANI, { stepBani: draft.roundupRuleBani })
+  const [connecting, setConnecting] = useState(false)
 
   return (
     <div className="flex flex-col gap-4">
@@ -61,8 +64,18 @@ export function PiggyBankStep({ draft, update, onFinish, pending, error }: { dra
         </div>
       </Card>
 
+      {connecting && (
+        <DemoBank
+          mode="consent"
+          onClose={() => setConnecting(false)}
+          onConfirm={() => {
+            setConnecting(false)
+            update({ cardLinked: true })
+          }}
+        />
+      )}
       <button
-        onClick={() => update({ cardLinked: !draft.cardLinked })}
+        onClick={() => (draft.cardLinked ? update({ cardLinked: false }) : setConnecting(true))}
         aria-pressed={draft.cardLinked}
         className={`flex items-center gap-3 rounded-[24px] border p-4 text-left text-sm transition-colors ${
           draft.cardLinked ? 'border-[#bfe8d1] bg-[#e3f5e9] dark:border-[#236243] dark:bg-[#1e3629]' : 'border-black/[.06] bg-white dark:border-white/10 dark:bg-[#211d2b]'
@@ -73,7 +86,9 @@ export function PiggyBankStep({ draft, update, onFinish, pending, error }: { dra
         </span>
         <span>
           <b className="block">{draft.cardLinked ? 'Card connected' : 'Connect your card'}</b>
-          <span className="text-xs text-[#858090] dark:text-[#a39cab]">Demo: we import this month&rsquo;s payments from a sample bank</span>
+          <span className="text-xs text-[#858090] dark:text-[#a39cab]">
+            {draft.cardLinked ? `${DEMO_ACCOUNT.bank} · ${DEMO_ACCOUNT.card}` : 'Demo: a sample bank with this month’s payments'}
+          </span>
         </span>
       </button>
 

@@ -5,9 +5,9 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { extractStatement, type ExtractResult } from '@/lib/ai'
 import type { StatementExtract } from '@/lib/contracts'
-import { lifestyleNumbers } from '@/lib/data/lifestyle-state'
 import { rebuildJar } from '@/lib/server/jar'
-import { transactionsForMonth } from '@/lib/server/mock-bank'
+import { profileDataFields, rejectOddProfile, saveProfileData } from '@/lib/server/profile-data'
+import { importMockMonth } from '@/lib/server/mock-bank'
 import { unwrap } from '@/lib/server/unwrap'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
@@ -60,24 +60,15 @@ export async function uploadStatement(formData: FormData): Promise<UploadResult>
   return { ok: true, uploadId: upload.id, extract: result.extract, source: result.source }
 }
 
-const OnboardingInput = z.object({
-  birthYear: z.number().int().min(1940).max(2010),
-  netSalaryBani: z.number().int().positive(),
-  yearsWorked: z.number().int().min(0).max(60),
-  pensions: z.array(
-    z.object({
-      kind: z.enum(['pillar2', 'pillar3']),
-      provider: z.string().trim().max(80),
-      balanceBani: z.number().int().nonnegative(),
-      asOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      uploadId: z.uuid().optional(),
-    }),
-  ),
-  roundupRuleBani: z.union([z.literal(0), z.literal(100), z.literal(500), z.literal(1000)]),
-  salaryPercentBp: z.number().int().min(0).max(2000),
-  cardLinked: z.boolean(),
-  termsAccepted: z.literal(true),
-})
+const OnboardingInput = z
+  .object({
+    ...profileDataFields,
+    roundupRuleBani: z.union([z.literal(0), z.literal(100), z.literal(500), z.literal(1000)]),
+    salaryPercentBp: z.number().int().min(0).max(2000),
+    cardLinked: z.boolean(),
+    termsAccepted: z.literal(true),
+  })
+  .superRefine(rejectOddProfile)
 export type OnboardingInput = z.infer<typeof OnboardingInput>
 
 /** Saves the profile, the pensions and the settings, imports a month of (mock) card data, then opens the app. */
@@ -86,37 +77,13 @@ export async function completeOnboarding(rawInput: OnboardingInput) {
   const input = OnboardingInput.parse(rawInput)
 
   // Re-running onboarding replaces what was entered before.
-  unwrap(await supabase.from('pension_assets').delete().eq('user_id', userId))
-  if (input.pensions.length > 0) {
-    unwrap(
-      await supabase.from('pension_assets').insert(
-        input.pensions.map((pension) => ({
-          user_id: userId,
-          type: pension.kind,
-          provider: pension.provider || null,
-          balance_bani: pension.balanceBani,
-          source: pension.uploadId ? 'statement_upload' : 'manual',
-          as_of: pension.asOf,
-        })),
-      ),
-    )
-  }
+  const startLevel = await saveProfileData(supabase, userId, input, null)
 
   // The reveal already showed the starting level: mark it seen so it doesn't replay as a level-up.
-  const { startLevel } = lifestyleNumbers({
-    birthYear: input.birthYear,
-    netSalaryBani: input.netSalaryBani,
-    yearsWorked: input.yearsWorked,
-    assets: input.pensions.map((pension) => ({ type: pension.kind, balance_bani: pension.balanceBani })),
-    jars: [],
-  })
   unwrap(
     await supabase
       .from('profiles')
       .update({
-        birth_year: input.birthYear,
-        net_salary_bani: input.netSalaryBani,
-        years_worked: input.yearsWorked,
         roundup_rule_bani: input.roundupRuleBani,
         salary_percent_bp: input.salaryPercentBp,
         card_linked: input.cardLinked,
@@ -128,20 +95,12 @@ export async function completeOnboarding(rawInput: OnboardingInput) {
   )
 
   const db = createAdminClient()
-  const uploadIds = input.pensions.flatMap((pension) => (pension.uploadId ? [pension.uploadId] : []))
-  if (uploadIds.length > 0) {
-    unwrap(await db.from('statement_uploads').update({ status: 'confirmed' }).in('id', uploadIds).eq('user_id', userId))
-  }
 
   // "Connect your card" in the demo: import this month's card payments so far.
   const now = new Date()
   const month = now.toISOString().slice(0, 7)
   if (input.cardLinked) {
-    const rows = transactionsForMonth(month, now.getUTCMonth(), input.netSalaryBani, {
-      untilDay: now.getUTCDate(),
-      idPrefix: `tx-${userId.slice(0, 8)}`,
-    }).map((row) => ({ ...row, currency: 'RON', user_id: userId }))
-    unwrap(await db.from('transactions').upsert(rows, { onConflict: 'user_id,external_id', ignoreDuplicates: true }))
+    await importMockMonth(db, userId, month, input.netSalaryBani, { untilDay: now.getUTCDate() })
   }
   await rebuildJar(db, userId, month)
 

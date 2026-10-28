@@ -1,6 +1,9 @@
 // Mock bank sync (NextGenPSD2-like rows): what "connect your card" imports in the demo.
 // Deterministic, fictional data: the same month always gives the same transactions.
 // Relative imports only, so scripts/seed.ts can use this with jiti.
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../supabase/database.types'
+import { unwrap } from './unwrap'
 
 // Card payments repeated every month. The amount changes a little from month to month.
 const CARD_PAYMENTS: { counterparty: string; description: string; baseBani: number }[] = [
@@ -66,4 +69,26 @@ export function transactionsForMonth(
     })
   })
   return rows.filter((row) => Number(row.booked_at.slice(8)) <= untilDay)
+}
+
+/** Each user's mock rows get their own ids, so importing a month twice adds nothing. */
+export function mockIdPrefix(userId: string) {
+  return `tx-${userId.slice(0, 8)}`
+}
+
+/**
+ * "The bank sync" of the demo: saves one month of mock transactions for a user.
+ * Rows that already exist (same external id) are skipped.
+ */
+export async function importMockMonth(
+  db: SupabaseClient<Database>,
+  userId: string,
+  month: string,
+  salaryBani: number,
+  options: { untilDay?: number; includeSalary?: boolean } = {},
+) {
+  const rows = transactionsForMonth(month, Number(month.slice(5)) - 1, salaryBani, { ...options, idPrefix: mockIdPrefix(userId) })
+    // Every row needs the same keys: in a bulk insert, a missing key becomes null, not the default.
+    .map((row) => ({ ...row, currency: 'RON', user_id: userId }))
+  unwrap(await db.from('transactions').upsert(rows, { onConflict: 'user_id,external_id', ignoreDuplicates: true }))
 }

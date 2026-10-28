@@ -16,6 +16,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
+  // App-like on phones: no pinch or double-tap zoom.
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   colorScheme: 'light dark',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },

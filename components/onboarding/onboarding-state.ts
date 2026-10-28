@@ -1,4 +1,6 @@
 // What the onboarding screens collect, kept as typed text until the last step.
+import { profileError, type ProfileField } from '@/lib/rules/profile-limits'
+
 export interface PensionDraft {
   key: string
   kind: 'pillar2' | 'pillar3'
@@ -6,7 +8,7 @@ export interface PensionDraft {
   balanceRon: string
   asOf: string
   uploadId?: string
-  source: 'ai' | 'sample' | 'manual'
+  source: 'ai' | 'sample' | 'manual' | 'saved'
 }
 
 export interface OnboardingDraft {
@@ -40,21 +42,33 @@ export function pensionIsValid(pension: PensionDraft) {
   return toBani(pension.balanceRon) >= 0 && /^\d{4}-\d{2}-\d{2}$/.test(pension.asOf)
 }
 
-export function questionsAreValid(draft: OnboardingDraft) {
-  const birthYear = Number(draft.birthYear)
-  const years = Number(draft.yearsWorked)
-  return (
-    Number.isInteger(birthYear) && birthYear >= 1940 && birthYear <= 2010 &&
-    toBani(draft.netSalaryRon) > 0 &&
-    draft.yearsWorked !== '' && Number.isInteger(years) && years >= 0 && years <= 60
-  )
+export type AnswerKey = 'birthYear' | 'netSalaryRon' | 'yearsWorked'
+
+const ANSWER_FOR_FIELD: Record<ProfileField, AnswerKey> = {
+  birthYear: 'birthYear',
+  netSalaryBani: 'netSalaryRon',
+  yearsWorked: 'yearsWorked',
+}
+
+/**
+ * Checks the three answers with the same limits the server uses (lib/rules/profile-limits).
+ * Empty answers are "not done yet", not an error, so nothing red shows while typing.
+ */
+export function checkAnswers(answers: Pick<OnboardingDraft, AnswerKey>): { ok: boolean; field?: AnswerKey; message?: string } {
+  if (!answers.birthYear || !answers.netSalaryRon || answers.yearsWorked === '') return { ok: false }
+  const error = profileError({
+    birthYear: Number(answers.birthYear),
+    netSalaryBani: toBani(answers.netSalaryRon),
+    yearsWorked: Number(answers.yearsWorked),
+  })
+  return error ? { ok: false, field: ANSWER_FOR_FIELD[error.field], message: error.message } : { ok: true }
 }
 
 /** Shared styles, copied from the Profile screen inputs. */
 export const INPUT_CLASS =
-  'w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3.5 py-3 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40'
+  'w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3.5 py-3 text-base outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40'
 export const LABEL_CLASS = 'mb-1.5 block text-xs font-medium text-[#858090] dark:text-[#a39cab]'
 export const PRIMARY_BUTTON =
-  'w-full rounded-xl bg-[#33256c] py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-50'
+  'pulse-hover w-full rounded-xl bg-[#33256c] py-3 text-sm font-semibold text-white disabled:opacity-50'
 export const SECONDARY_BUTTON =
-  'w-full rounded-xl border border-[#ddd8e6] py-3 text-sm font-semibold text-[#5f4bb6] transition-colors hover:bg-[#f1effa] disabled:opacity-60 dark:border-[#353042] dark:text-[#a594f0] dark:hover:bg-[#2b253a]'
+  'pulse-hover w-full rounded-xl border border-[#ddd8e6] py-3 text-sm font-semibold text-[#5f4bb6] transition-colors hover:bg-[#f1effa] disabled:opacity-60 dark:border-[#353042] dark:text-[#a594f0] dark:hover:bg-[#2b253a]'

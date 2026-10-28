@@ -76,7 +76,11 @@ async function callGemini({ system, prompt, pdfBase64, json }: ModelRequest) {
         }),
       }
     );
-    if (!response.ok) continue;
+    if (!response.ok) {
+      // Shows up in the server log, e.g. 401 = the key in .env.local is wrong.
+      console.warn(`Gemini ${model}: HTTP ${response.status}`);
+      continue;
+    }
 
     const data = (await response.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string; thought?: boolean }> } }>;

@@ -13,9 +13,12 @@ import {
   slotUnlockedAt,
   levelState,
   formatFreedom,
+  formatRatio,
   formatRon,
   MAX_LEVEL,
   floatInterestBani,
+  profileError,
+  daysOfFreedomFromSalary,
 } from "../index";
 
 const andrei = JSON.parse(
@@ -138,4 +141,34 @@ test("floatInterestBani: interest on the one-month hold", () => {
   assert.strictEqual(floatInterestBani(50000, 0), 0);
   assert.strictEqual(floatInterestBani(-100, 30), 0);
   assert.strictEqual(floatInterestBani(50000, 30, 0.06), 247);
+});
+
+test("profileError: rejects the inputs that made the reveal illogical", () => {
+  const ok = { birthYear: 1992, netSalaryBani: 650000, yearsWorked: 12 };
+  assert.strictEqual(profileError(ok, 2026), null);
+  assert.strictEqual(profileError({ ...ok, netSalaryBani: 100 }, 2026)?.field, "netSalaryBani"); // 1 RON
+  assert.strictEqual(profileError({ ...ok, netSalaryBani: 199999 }, 2026)?.field, "netSalaryBani");
+  assert.strictEqual(profileError({ ...ok, netSalaryBani: 200000 }, 2026), null); // the 2,000 RON floor
+  assert.strictEqual(profileError({ ...ok, birthYear: 1961 }, 2026)?.field, "birthYear"); // 65, already retired
+  assert.strictEqual(profileError({ ...ok, birthYear: 2009 }, 2026)?.field, "birthYear"); // 17
+  assert.strictEqual(profileError({ ...ok, yearsWorked: 19 }, 2026)?.field, "yearsWorked"); // 34 − 16 = 18 max
+  assert.strictEqual(profileError({ ...ok, yearsWorked: 18 }, 2026), null);
+});
+
+test("formatRatio and formatFreedom: capped so a typo can't show absurd numbers", () => {
+  assert.strictEqual(formatRatio(0.742), "74%");
+  assert.strictEqual(formatRatio(411.61), "more than 150%");
+  assert.strictEqual(formatFreedom(15 * 365), "15 years");
+  assert.strictEqual(formatFreedom(15 * 365 + 1), "15+ years");
+});
+
+test("days of freedom use the same state pension as the income projection", () => {
+  // 55 years old, 5 years worked: only 15 of 35 contribution years → a smaller state pension.
+  const income = projectedRetirementIncome({ age: 55, netSalaryBani: 650000, yearsWorked: 5, pillarTwoBani: 0, pillarThreeBani: 0 });
+  assert.ok(Math.abs(income.stateReplacementRate - 0.48 * (15 / 35)) < 1e-9);
+  assert.strictEqual(income.statePensionBani, Math.round(650000 * income.stateReplacementRate));
+  // A bigger gap to cover → the same savings buy fewer days than with the flat 48%.
+  const own = daysOfFreedomFromSalary(4200000, 650000, income.stateReplacementRate).base;
+  const flat = daysOfFreedomFromSalary(4200000, 650000).base;
+  assert.ok(own < flat);
 });

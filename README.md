@@ -12,9 +12,9 @@ Full plan: [docs/plan.md](docs/plan.md).
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md) (team rules and stack), then the `AGENTS.md` in your folder.
-2. `cp .env.example .env.local` and fill in the Supabase keys and the demo account
-   (ask the team; never commit them).
-3. Install, seed the demo user, run, then open http://localhost:3000 (best at phone width):
+2. `cp .env.example .env.local` and fill in the Supabase keys, the test user and the admin
+   account (ask the team; never commit them).
+3. Install, seed (test user Andrei + admin account), run, then open http://localhost:3000 (best at phone width):
 
 ```bash
 npm install
@@ -28,10 +28,12 @@ Before a PR: `npm run lint`, `npm test` and `npm run build` must pass.
 
 | URL | What |
 |---|---|
-| `/` | landing page (hook, how it works, sources, business model) |
-| `/login`, `/register` | auth; "Log in as Andrei (demo)" skips sign-up |
-| `/onboarding` | statement upload → 3 questions → retirement reveal → round-up settings |
-| `/app` | Home (days + 3D scene + level), Month (offer), Profile |
+| `/` | landing page: the question, one line, the island; details behind "Find out more" |
+| `/login`, `/register` | auth (no demo shortcut: the demo shows the real flow) |
+| `/onboarding` | statement upload → 3 questions → retirement reveal → round-ups + demo bank |
+| `/app` | Home (days count-up, 3D island you can spin, level, share), Month (pay with card, offer), Profile (edit your details) |
+| `/i/<code>` | public "Share my island" card: first name, level, island, sign-up button |
+| `/admin` | company numbers (users, money held, interest, projection); admin account only |
 | `/terms` | plain-English terms, including the one-month hold and interest |
 | `/dev/scene` | 3D scene playground (dev only) |
 

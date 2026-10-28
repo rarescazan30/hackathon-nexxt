@@ -1,7 +1,6 @@
 'use server'
 
-// Server actions for login, register and the demo login.
-// They run on the server, so the demo password never reaches the browser.
+// Server actions for login and register. They run on the server.
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
@@ -82,19 +81,4 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
     return { error: 'We sent you a confirmation email. Open the link, then log in.', ...fields }
   }
   redirect(AFTER_SIGN_UP)
-}
-
-export async function signInAsDemo(): Promise<AuthState> {
-  const email = process.env.DEMO_USER_EMAIL
-  const password = process.env.DEMO_USER_PASSWORD
-  if (!email || !password) {
-    return { error: 'The demo account is not set up (DEMO_USER_EMAIL / DEMO_USER_PASSWORD).' }
-  }
-
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) {
-    return { error: 'The demo account is not available. Run npm run seed.' }
-  }
-  redirect(AFTER_LOGIN)
 }

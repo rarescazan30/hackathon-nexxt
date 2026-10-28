@@ -271,6 +271,7 @@ export type Database = {
           roundup_multiplier: number
           roundup_rule_bani: number
           salary_percent_bp: number
+          start_level: number | null
           terms_accepted_at: string | null
           updated_at: string
           years_worked: number | null
@@ -289,6 +290,7 @@ export type Database = {
           roundup_multiplier?: number
           roundup_rule_bani?: number
           salary_percent_bp?: number
+          start_level?: number | null
           terms_accepted_at?: string | null
           updated_at?: string
           years_worked?: number | null
@@ -307,6 +309,7 @@ export type Database = {
           roundup_multiplier?: number
           roundup_rule_bani?: number
           salary_percent_bp?: number
+          start_level?: number | null
           terms_accepted_at?: string | null
           updated_at?: string
           years_worked?: number | null
@@ -350,6 +353,44 @@ export type Database = {
             foreignKeyName: "roundups_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      share_links: {
+        Row: {
+          code: string
+          first_name: string
+          image_path: string | null
+          level: number
+          slots: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          first_name: string
+          image_path?: string | null
+          level: number
+          slots: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          first_name?: string
+          image_path?: string | null
+          level?: number
+          slots?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "share_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

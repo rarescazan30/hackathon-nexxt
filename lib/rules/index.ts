@@ -8,3 +8,4 @@ export * from "./projection";
 export * from "./freedom";
 export * from "./lifestyle";
 export * from "./float";
+export * from "./profile-limits";

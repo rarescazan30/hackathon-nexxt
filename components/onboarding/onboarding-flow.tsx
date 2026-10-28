@@ -86,7 +86,7 @@ export function OnboardingFlow({ firstName }: { firstName: string }) {
         </div>
 
         <header className="px-1 pb-6 pt-6">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{current.eyebrow}</p>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{current.eyebrow}</p>
           <h1 className="text-[27px] font-semibold leading-tight tracking-[-.04em]">{current.title}</h1>
           <p className="mt-2 text-sm leading-6 text-[#706b7b] dark:text-[#aaa4b6]">{current.subtitle}</p>
         </header>

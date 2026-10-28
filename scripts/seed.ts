@@ -1,4 +1,4 @@
-// `npm run seed`: fills Supabase with Pillar III and the demo user Andrei (34).
+// `npm run seed`: fills Supabase with Pillar III, the test user Andrei (34) and the admin account.
 // Safe to run again: it deletes Andrei (everything of his cascades) and recreates him.
 // Uses the secret key, so it only runs on a developer machine with .env.local.
 import fs from 'node:fs'
@@ -15,6 +15,7 @@ import {
 } from '../lib/rules'
 import { rebuildJar } from '../lib/server/jar'
 import { answerOffer, collectJar, investJar, offerJar, oneMonthLater } from '../lib/server/money-flow'
+import { mockIdPrefix } from '../lib/server/mock-bank'
 import { unwrap } from '../lib/server/unwrap'
 import { createAdminClient } from '../lib/supabase/admin'
 import {
@@ -102,8 +103,9 @@ async function seedProfile(userId: string) {
 
 async function seedTransactions(userId: string) {
   // The current month's salary comes from the persona's sample transactions instead.
+  // Same ids as the app's mock bank (mockIdPrefix), so "Simulate end of month" doesn't import them twice.
   const generated = MONTHS.flatMap((month, i) =>
-    transactionsForMonth(month, i, persona.salaryBani, { includeSalary: month !== CURRENT_MONTH }),
+    transactionsForMonth(month, i, persona.salaryBani, { includeSalary: month !== CURRENT_MONTH, idPrefix: mockIdPrefix(userId) }),
   )
 
   // The persona's sample transactions are the ones Ana's tests check, so they go in as-is.
@@ -147,7 +149,7 @@ async function seedJars(userId: string) {
   }
 }
 
-/** Mark Andrei's current level as seen, so the demo starts without a level-up overlay. */
+/** Store Andrei's starting level and mark his current level as seen (no level-up overlay on login). */
 async function markLevelSeen(userId: string) {
   const jars = unwrap(
     await db
@@ -169,11 +171,59 @@ async function markLevelSeen(userId: string) {
     .map((jar) => ({ month: jar.month, amountBani: jar.accepted_amount_bani ?? 0 }))
   const state = levelState(startLevel, xpFromContributions(contributions, persona.salaryBani))
 
-  unwrap(await db.from('profiles').update({ last_seen_level: state.level }).eq('id', userId))
+  unwrap(await db.from('profiles').update({ last_seen_level: state.level, start_level: startLevel }).eq('id', userId))
   return { jars, income, startLevel, state }
 }
 
+// The admin account (ADMIN_EMAIL / ADMIN_PASSWORD): a finished, minimal profile so it can
+// open /app, where it sees the Admin button. Created once, its password kept in sync.
+const ADMIN_PROFILE = { birthYear: 1990, netSalaryBani: 650000, yearsWorked: 12 }
+
+async function upsertAdminUser() {
+  const adminEmail = process.env.ADMIN_EMAIL
+  const adminPassword = process.env.ADMIN_PASSWORD
+  if (!adminEmail || !adminPassword) {
+    console.log('No ADMIN_EMAIL / ADMIN_PASSWORD in .env.local: skipping the admin account')
+    return
+  }
+  const { users } = unwrap(await db.auth.admin.listUsers({ perPage: 1000 }))
+  let adminId = users.find((user) => user.email === adminEmail)?.id
+  if (adminId) {
+    unwrap(await db.auth.admin.updateUserById(adminId, { password: adminPassword }))
+  } else {
+    const { user } = unwrap(
+      await db.auth.admin.createUser({ email: adminEmail, password: adminPassword, email_confirm: true, user_metadata: { full_name: 'zile. Admin' } }),
+    )
+    adminId = user!.id
+  }
+
+  const income = projectedRetirementIncome({
+    age: Number(CURRENT_MONTH.slice(0, 4)) - ADMIN_PROFILE.birthYear,
+    netSalaryBani: ADMIN_PROFILE.netSalaryBani,
+    yearsWorked: ADMIN_PROFILE.yearsWorked,
+    pillarTwoBani: 0,
+    pillarThreeBani: 0,
+  })
+  const startLevel = firstLevelOfTier(tierFromRatio(income.replacementRatio))
+  unwrap(
+    await db
+      .from('profiles')
+      .update({
+        birth_year: ADMIN_PROFILE.birthYear,
+        net_salary_bani: ADMIN_PROFILE.netSalaryBani,
+        years_worked: ADMIN_PROFILE.yearsWorked,
+        start_level: startLevel,
+        last_seen_level: startLevel,
+        onboarding_completed: true,
+        terms_accepted_at: new Date().toISOString(),
+      })
+      .eq('id', adminId),
+  )
+  console.log(`Admin account ready: ${adminEmail}`)
+}
+
 async function main() {
+  await upsertAdminUser()
   const userId = await recreateDemoUser()
   await seedProducts()
   await seedProfile(userId)

@@ -19,6 +19,8 @@ export interface LifestyleSceneProps {
   /** The slot that just changed: it pops in with sparkles (level-up moment). */
   highlight?: Slot | null
   className?: string
+  /** Keep the last frame readable, so "Share my island" can take a picture of it. */
+  snapshot?: boolean
 }
 
 const SLOT_POSITIONS: Record<Slot, [number, number, number]> = {
@@ -31,6 +33,9 @@ const SLOT_POSITIONS: Record<Slot, [number, number, number]> = {
 const SLOT_MODELS = { home: Home, transport: Transport, food: Food, extras: Extras }
 
 const IDLE_TURN_SPEED = 0.12 // radians per second
+const DRAG_TURN_PER_PIXEL = 0.012 // radians per pixel dragged
+const DRAG_FRICTION = 4 // how fast a flick slows down (per second)
+const RESUME_AFTER_DRAG_MS = 2000 // the idle turn comes back this long after letting go
 const POP_SECONDS = 0.7
 const SPARKLE_SECONDS = 1.4
 const CAMERA_FIT = 8.6 // world units that fit across the smaller side of the canvas
@@ -106,8 +111,51 @@ function SlotModel({ slot, tier, highlighted }: { slot: Slot; tier: number; high
 
 function Island({ slots, highlight, turning }: { slots: SlotTiers; highlight: Slot | null; turning: boolean }) {
   const ref = useRef<ThreeGroup>(null)
+  const canvas = useThree((state) => state.gl.domElement)
+  // What the pointer did since the last frame; written by DOM events, read by the render loop.
+  const drag = useRef({ dragging: false, lastX: 0, pendingTurn: 0, spin: 0, releasedAt: 0 })
+
+  // Drag left / right to spin the island. Only horizontal: vertical swipes still scroll the page.
+  useEffect(() => {
+    const down = (e: PointerEvent) => {
+      canvas.setPointerCapture(e.pointerId)
+      drag.current = { ...drag.current, dragging: true, lastX: e.clientX, spin: 0 }
+    }
+    const move = (e: PointerEvent) => {
+      if (!drag.current.dragging) return
+      drag.current.pendingTurn += (e.clientX - drag.current.lastX) * DRAG_TURN_PER_PIXEL
+      drag.current.lastX = e.clientX
+    }
+    const up = () => {
+      drag.current.dragging = false
+      drag.current.releasedAt = performance.now()
+    }
+    canvas.addEventListener('pointerdown', down)
+    canvas.addEventListener('pointermove', move)
+    canvas.addEventListener('pointerup', up)
+    canvas.addEventListener('pointercancel', up)
+    return () => {
+      canvas.removeEventListener('pointerdown', down)
+      canvas.removeEventListener('pointermove', move)
+      canvas.removeEventListener('pointerup', up)
+      canvas.removeEventListener('pointercancel', up)
+    }
+  }, [canvas])
+
   useFrame((_, delta) => {
-    if (ref.current && turning) ref.current.rotation.y += delta * IDLE_TURN_SPEED
+    if (!ref.current) return
+    const d = drag.current
+    if (d.dragging) {
+      // Follow the finger exactly; remember the speed for the flick.
+      ref.current.rotation.y += d.pendingTurn
+      d.spin = delta > 0 ? d.pendingTurn / delta : 0
+      d.pendingTurn = 0
+      return
+    }
+    // After letting go: the flick slows down, then the slow idle turn comes back.
+    ref.current.rotation.y += d.spin * delta
+    d.spin *= Math.exp(-DRAG_FRICTION * delta)
+    if (turning && performance.now() - d.releasedAt > RESUME_AFTER_DRAG_MS) ref.current.rotation.y += delta * IDLE_TURN_SPEED
   })
   return (
     <group ref={ref} rotation={[0, -0.35, 0]}>
@@ -119,7 +167,7 @@ function Island({ slots, highlight, turning }: { slots: SlotTiers; highlight: Sl
   )
 }
 
-export function LifestyleScene({ slots, highlight = null, className = '' }: LifestyleSceneProps) {
+export function LifestyleScene({ slots, highlight = null, className = '', snapshot = false }: LifestyleSceneProps) {
   const container = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(true)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -141,8 +189,12 @@ export function LifestyleScene({ slots, highlight = null, className = '' }: Life
   }, [])
 
   return (
-    <div ref={container} className={`relative aspect-square w-full ${className}`}>
+    <div
+      ref={container}
+      className={`relative aspect-square w-full cursor-grab touch-pan-y select-none active:cursor-grabbing ${className}`}
+    >
       <Canvas
+        gl={{ preserveDrawingBuffer: snapshot }}
         orthographic
         shadows
         dpr={[1, 1.5]}

@@ -73,6 +73,12 @@ export interface RetirementIncome {
   totalMonthlyBani: number;
   /** totalMonthlyBani ÷ net salary today, e.g. 0.74 = 74%. */
   replacementRatio: number;
+  /**
+   * The state pension as a share of today's net salary for this person (48% with a full
+   * contribution record, less without). Days of freedom use the same rate, so the two
+   * numbers on screen tell one story.
+   */
+  stateReplacementRate: number;
 }
 
 /**
@@ -90,9 +96,8 @@ export function projectedRetirementIncome(input: RetirementIncomeInput): Retirem
   const retirementMonths = RETIREMENT_HORIZON_YEARS * 12;
 
   const contributionYears = Math.min(FULL_CONTRIBUTION_YEARS, Math.max(0, input.yearsWorked) + yearsLeft);
-  const statePensionBani = Math.round(
-    salary * STATE_PENSION_REPLACEMENT_RATE * (contributionYears / FULL_CONTRIBUTION_YEARS)
-  );
+  const stateReplacementRate = STATE_PENSION_REPLACEMENT_RATE * (contributionYears / FULL_CONTRIBUTION_YEARS);
+  const statePensionBani = Math.round(salary * stateReplacementRate);
 
   const grossSalaryBani = salary / NET_TO_GROSS_RATIO;
   const pillarTwoMonthlyContribution = Math.round(grossSalaryBani * PILLAR_TWO_CONTRIBUTION_RATE);
@@ -109,6 +114,7 @@ export function projectedRetirementIncome(input: RetirementIncomeInput): Retirem
     pillarThreeMonthlyBani,
     totalMonthlyBani,
     replacementRatio: salary > 0 ? totalMonthlyBani / salary : 0,
+    stateReplacementRate,
   };
 }
 
@@ -145,12 +151,16 @@ function previousMonth(month: string): string {
  * XP earned through the app: XP_PER_DAY for each day of freedom a contribution adds,
  * plus STREAK_BONUS_XP when the previous month also had a contribution.
  */
-export function xpFromContributions(contributions: Contribution[], netSalaryBani: number): number {
+export function xpFromContributions(
+  contributions: Contribution[],
+  netSalaryBani: number,
+  stateReplacementRate?: number
+): number {
   const months = new Set(contributions.filter((c) => c.amountBani > 0).map((c) => c.month));
   let xp = 0;
   for (const contribution of contributions) {
     if (contribution.amountBani <= 0) continue;
-    xp += daysAddedFromAmount(contribution.amountBani, netSalaryBani).base * XP_PER_DAY;
+    xp += daysAddedFromAmount(contribution.amountBani, netSalaryBani, stateReplacementRate).base * XP_PER_DAY;
     if (months.has(previousMonth(contribution.month))) xp += STREAK_BONUS_XP;
   }
   return xp;
@@ -223,9 +233,13 @@ function plural(count: number, unit: string): string {
   return `${count} ${unit}${count === 1 ? "" : "s"}`;
 }
 
+/** Beyond the retirement horizon more days don't mean more freedom, so the display stops there. */
+const MAX_FREEDOM_DAYS = RETIREMENT_HORIZON_YEARS * DAYS_PER_YEAR;
+
 /** 12 → "12 days", 125 → "4 months 5 days", 1156 → "3 years 2 months". Two units at most. */
 export function formatFreedom(days: number): string {
   const total = Math.max(0, Math.round(days));
+  if (total > MAX_FREEDOM_DAYS) return `${RETIREMENT_HORIZON_YEARS}+ years`;
   const years = Math.floor(total / DAYS_PER_YEAR);
   const months = Math.floor((total % DAYS_PER_YEAR) / DAYS_PER_DISPLAY_MONTH);
   const rest = total % DAYS_PER_YEAR % DAYS_PER_DISPLAY_MONTH;
@@ -233,6 +247,15 @@ export function formatFreedom(days: number): string {
   if (years > 0) return months > 0 ? `${plural(years, "year")} ${plural(months, "month")}` : plural(years, "year");
   if (months > 0) return rest > 0 ? `${plural(months, "month")} ${plural(rest, "day")}` : plural(months, "month");
   return plural(rest, "day");
+}
+
+/** Above this the percentage stops meaning much (and a typo can make it huge). */
+export const MAX_SHOWN_RATIO = 1.5;
+
+/** 0.742 → "74%", 3.2 → "more than 150%". */
+export function formatRatio(ratio: number): string {
+  if (ratio > MAX_SHOWN_RATIO) return `more than ${Math.round(MAX_SHOWN_RATIO * 100)}%`;
+  return `${Math.round(Math.max(0, ratio) * 100)}%`;
 }
 
 /** 129350 → "1,293.50 RON". `wholeRon` drops the decimals: "1,294 RON". */

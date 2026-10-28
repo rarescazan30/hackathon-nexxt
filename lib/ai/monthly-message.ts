@@ -5,6 +5,8 @@ import { callModel } from "./model";
 
 export interface MonthlyMessageFacts {
   firstName: string;
+  /** e.g. "October" */
+  month: string;
   amountBani: number;
   daysAdded: number;
   /** e.g. "Good groceries"; null at the top level. */
@@ -27,13 +29,14 @@ export function fallbackMonthlyMessage(facts: MonthlyMessageFacts): string {
   const reward = facts.levelUpNow && facts.nextUnlock
     ? `That's +${facts.daysAdded} days of freedom, enough to unlock ${facts.nextUnlock.toLowerCase()}.`
     : `That's +${facts.daysAdded} days of freedom in retirement.`;
-  return `${facts.firstName}, you saved ${amount} this month. ${reward}`;
+  return `${facts.firstName}, you saved ${amount} in ${facts.month}. ${reward}`;
 }
 
 export async function monthlyOfferMessage(facts: MonthlyMessageFacts): Promise<string> {
   const amount = formatRon(facts.amountBani, { wholeRon: true });
   const prompt = [
     `Name: ${facts.firstName}`,
+    `Month: ${facts.month}`,
     `Saved this month: ${amount}`,
     `Days of freedom this adds: ${facts.daysAdded}`,
     facts.levelUpNow && facts.nextUnlock ? `Accepting unlocks in their retirement scene: ${facts.nextUnlock}` : "",

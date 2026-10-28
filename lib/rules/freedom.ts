@@ -106,12 +106,14 @@ export function daysOfFreedom(
  *
  * @param savingsBani - Total private savings (Pillar 2 + Pillar 3 + investments) in integer bani.
  * @param monthlySalaryBani - Net monthly salary in integer bani.
+ * @param stateReplacementRate - The user's own state pension rate (see projectedRetirementIncome); default 48%.
  */
 export function daysOfFreedomFromSalary(
   savingsBani: number,
-  monthlySalaryBani: number
+  monthlySalaryBani: number,
+  stateReplacementRate: number = STATE_PENSION_REPLACEMENT_RATE
 ): DaysOfFreedom {
-  const { dailyGapBani } = calculateRetirementGap(monthlySalaryBani);
+  const { dailyGapBani } = calculateRetirementGap(monthlySalaryBani, TARGET_RETIREMENT_REPLACEMENT_RATE, stateReplacementRate);
   return daysOfFreedom(savingsBani, dailyGapBani);
 }
 
@@ -121,17 +123,19 @@ export function daysOfFreedomFromSalary(
  *
  * @param amountBani - Additional investment in integer bani.
  * @param monthlySalaryBani - Net monthly salary in integer bani.
+ * @param stateReplacementRate - The user's own state pension rate; default 48%.
  */
 export function daysAddedFromAmount(
   amountBani: number,
-  monthlySalaryBani: number
+  monthlySalaryBani: number,
+  stateReplacementRate: number = STATE_PENSION_REPLACEMENT_RATE
 ): DaysOfFreedom {
   const safeAmount = Math.max(0, Math.floor(amountBani || 0));
   if (safeAmount === 0) {
     return { pessimistic: 0, base: 0, optimistic: 0 };
   }
 
-  const { dailyGapBani } = calculateRetirementGap(monthlySalaryBani);
+  const { dailyGapBani } = calculateRetirementGap(monthlySalaryBani, TARGET_RETIREMENT_REPLACEMENT_RATE, stateReplacementRate);
   return daysOfFreedom(safeAmount, dailyGapBani);
 }
 

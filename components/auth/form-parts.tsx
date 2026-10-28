@@ -23,7 +23,7 @@ export function Field({ label, name, type = 'text', autoComplete, defaultValue, 
         defaultValue={defaultValue}
         minLength={minLength}
         required
-        className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3.5 py-3 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
+        className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3.5 py-3 text-base outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
       />
     </div>
   )
@@ -34,7 +34,7 @@ export function SubmitButton({ pending, children }: { pending: boolean; children
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 w-full rounded-xl bg-[#33256c] py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
+      className="pulse-hover mt-2 w-full rounded-xl bg-[#33256c] py-3 text-sm font-semibold text-white disabled:opacity-60"
     >
       {pending ? 'One moment…' : children}
     </button>

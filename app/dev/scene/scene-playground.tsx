@@ -26,7 +26,7 @@ export function ScenePlayground() {
     <main className="min-h-screen bg-[#f7f6f9] text-[#292431] dark:bg-[#18151f] dark:text-[#f8f6fb]">
       <div className="mx-auto flex w-full max-w-[430px] flex-col gap-4 px-5 py-6">
         <header className="px-1">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Dev only</p>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Dev only</p>
           <h1 className="text-[27px] font-semibold tracking-[-.04em]">Scene playground</h1>
         </header>
 

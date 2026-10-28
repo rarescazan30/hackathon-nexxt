@@ -19,7 +19,7 @@ export function AuthLayout({ eyebrow, title, subtitle, children, footer }: AuthL
         </Link>
 
         <header className="px-1 pb-6 pt-10">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{eyebrow}</p>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{eyebrow}</p>
           <h1 className="text-[27px] font-semibold tracking-[-.04em]">{title}</h1>
           <p className="mt-2 text-sm leading-6 text-[#706b7b] dark:text-[#aaa4b6]">{subtitle}</p>
         </header>

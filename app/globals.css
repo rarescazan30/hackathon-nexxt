@@ -248,3 +248,35 @@
     cursor: pointer;
   }
 }
+
+/* Slightly larger small text (team feedback): 12 → 13px and 14 → 15px. */
+@theme {
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+}
+
+/* Buttons pulse gently while hovered; on touch screens they give a short press instead. */
+@keyframes pulse-hover {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@layer utilities {
+  @media (hover: hover) {
+    .pulse-hover:not(:disabled):hover {
+      animation: pulse-hover 600ms ease-in-out infinite;
+      box-shadow: 0 8px 24px rgba(51, 37, 108, 0.18);
+    }
+  }
+  .pulse-hover:not(:disabled):active {
+    animation: none;
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-hover:not(:disabled):hover {
+      animation: none;
+    }
+  }
+}

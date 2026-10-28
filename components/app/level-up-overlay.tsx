@@ -25,7 +25,7 @@ export function LevelUpOverlay({ level, slot, slots, isMilestone }: { level: num
           <LifestyleScene slots={slots} highlight={slot} />
         </div>
         <div className="px-6 pb-6">
-          <p className="text-[11px] font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{isMilestone ? 'New lifestyle unlocked' : 'Level up'}</p>
+          <p className="text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{isMilestone ? 'New lifestyle unlocked' : 'Level up'}</p>
           <h2 className="mt-1 text-[30px] font-semibold tracking-[-.04em]">Level {level}</h2>
           <p className="mt-2 text-sm text-[#706b7b] dark:text-[#aaa4b6]">
             Your retirement now comes with <b className="text-[#292431] dark:text-white">{slotLabel(slot, slots[slot]).toLowerCase()}</b>.
