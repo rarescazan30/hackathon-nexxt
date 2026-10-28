@@ -117,22 +117,22 @@ export function ProgressScreen() {
 
       <div className="mb-5 flex items-end justify-between gap-2">
         <div>
-          <p className="text-sm text-ink-muted">
+          <p className="text-sm text-[#858090] dark:text-[#a39cab]">
             La {inspectedPoint.age} de ani, ai putea avea
           </p>
-          <p className="text-4xl font-semibold tracking-[-.06em] text-brand-deep dark:text-white">
+          <p className="text-4xl font-semibold tracking-[-.06em] text-[#33256c] dark:text-white">
             {formatNumberRo(inspectedPoint.base)} zile
           </p>
-          <p className="mt-1 text-xs text-ink-muted">
+          <p className="mt-1 text-xs text-[#858090] dark:text-[#a39cab]">
             Interval: {formatNumberRo(inspectedPoint.pessimistic)} (prudent) –{' '}
             {formatNumberRo(inspectedPoint.optimistic)} zile (optimist)
           </p>
         </div>
         <div className="text-right">
-          <span className="inline-block rounded-full bg-mint-soft px-3 py-1.5 text-xs font-semibold text-mint-text">
+          <span className="inline-block rounded-full bg-[#e3f5e9] px-3 py-1.5 text-xs font-semibold text-[#438565] dark:bg-[#1e3629] dark:text-[#6bc495]">
             +{formatNumberRo(projectedMonthlyDaysWithSlider)} luna asta
           </span>
-          <p className="mt-1.5 text-[11px] text-ink-muted">
+          <p className="mt-1.5 text-[11px] text-[#858090] dark:text-[#a39cab]">
             Azi: <b>{formatNumberRo(acquiredDays)} zile</b> dobândite
           </p>
         </div>
@@ -142,7 +142,7 @@ export function ProgressScreen() {
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h2 className="font-semibold">Proiecția ta</h2>
-            <p className="text-xs text-ink-muted">
+            <p className="text-xs text-[#858090] dark:text-[#a39cab]">
               Apasă pe grafic pentru a vedea vârsta · Bază: {formatLei(totalMonthlyContributionLei)}/lună
             </p>
           </div>
@@ -150,7 +150,7 @@ export function ProgressScreen() {
             type="button"
             aria-label="Informații despre proiecție"
             onClick={() => setShowInfo((v) => !v)}
-            className="rounded-full p-1 text-ink-muted hover:bg-brand-soft"
+            className="rounded-full p-1 text-[#858090] hover:bg-[#f1effa] dark:text-[#a39cab] dark:hover:bg-[#2b253a]"
           >
             <CircleHelp size={18} />
           </button>
@@ -178,16 +178,20 @@ export function ProgressScreen() {
         )}
 
         <div className="relative h-48 select-none">
-          <div className="absolute inset-x-0 top-4 border-t border-dashed border-line-dashed" />
-          <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-line-dashed" />
-          <div className="absolute inset-x-0 bottom-6 border-t border-dashed border-line-dashed" />
+          <div className="absolute inset-x-0 top-4 border-t border-dashed border-[#e2dfe8] dark:border-[#353042]" />
+          <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-[#e2dfe8] dark:border-[#353042]" />
+          <div className="absolute inset-x-0 bottom-6 border-t border-dashed border-[#e2dfe8] dark:border-[#353042]" />
 
           <svg
             className="absolute inset-0 h-full w-full overflow-visible"
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             preserveAspectRatio="none"
           >
-            <path d={areaPath} fill="var(--brand-tint)" className="transition-all duration-300" />
+            <path
+              d={areaPath}
+              fill={state.darkMode ? '#322a47' : '#e8e2fb'}
+              className="transition-all duration-300"
+            />
             <path
               d={optimisticPath}
               fill="none"
@@ -207,7 +211,7 @@ export function ProgressScreen() {
             <path
               d={basePath}
               fill="none"
-              stroke="var(--brand-primary)"
+              stroke="#6f5cc1"
               strokeWidth="3"
               className="transition-all duration-300"
             />
@@ -216,7 +220,7 @@ export function ProgressScreen() {
               y1={padTop}
               x2={activeCoord.x}
               y2={svgHeight - padBottom + 6}
-              stroke="var(--brand-lavender)"
+              stroke="#8c7ad9"
               strokeDasharray="3 3"
               strokeWidth="1.5"
             />
@@ -224,7 +228,7 @@ export function ProgressScreen() {
               cx={activeCoord.x}
               cy={activeCoord.y}
               r="5"
-              fill="var(--brand-deep)"
+              fill="#33256c"
               stroke="#ffffff"
               strokeWidth="2"
             />
@@ -243,7 +247,7 @@ export function ProgressScreen() {
             ))}
           </div>
 
-          <div className="absolute bottom-0 flex w-full justify-between text-[10px] font-medium text-ink-muted">
+          <div className="absolute bottom-0 flex w-full justify-between text-[10px] font-medium text-[#858090] dark:text-[#a39cab]">
             {[0, 3, 8, 12].map((idx) => {
               const pt = projectionPoints[idx]
               if (!pt) return null
@@ -255,8 +259,8 @@ export function ProgressScreen() {
                   onClick={() => setSelectedIdx(idx)}
                   className={`rounded px-1 py-0.5 transition-colors ${
                     isSelected
-                      ? 'bg-brand-deep text-white'
-                      : 'hover:bg-brand-soft hover:text-brand-medium'
+                      ? 'bg-[#33256c] text-white'
+                      : 'hover:bg-[#f1effa] hover:text-[#5f4bb6] dark:hover:bg-[#2b253a]'
                   }`}
                 >
                   {idx === 12 ? `${pt.age} ani` : pt.age}
@@ -266,10 +270,10 @@ export function ProgressScreen() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-ink-muted">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#858090] dark:text-[#a39cab]">
           <div className="flex gap-4">
             <span>
-              <i className="mr-1 inline-block size-2 rounded-full bg-brand-primary" />
+              <i className="mr-1 inline-block size-2 rounded-full bg-[#6f5cc1]" />
               Bază ({formatNumberRo(inspectedPoint.base)}z)
             </span>
             <span>
@@ -277,7 +281,7 @@ export function ProgressScreen() {
               Optimist ({formatNumberRo(inspectedPoint.optimistic)}z)
             </span>
             <span>
-              <i className="mr-1 inline-block size-2 rounded-full bg-chart-prudent" />
+              <i className="mr-1 inline-block size-2 rounded-full bg-[#a8a1b5]" />
               Prudent ({formatNumberRo(inspectedPoint.pessimistic)}z)
             </span>
           </div>
@@ -285,7 +289,7 @@ export function ProgressScreen() {
             <button
               type="button"
               onClick={() => setSelectedIdx(null)}
-              className="font-semibold text-brand-accent"
+              className="font-semibold text-[#6b57bd] dark:text-[#a594f0]"
             >
               Vezi la 65 ani
             </button>
@@ -296,7 +300,7 @@ export function ProgressScreen() {
       <Card className="mt-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold">Joacă-te cu scenariul</h2>
-          <span className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-medium">
+          <span className="rounded-full bg-[#f1effa] px-2.5 py-1 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
             Total: {formatLei(totalMonthlyContributionLei)}/lună
           </span>
         </div>
@@ -306,7 +310,9 @@ export function ProgressScreen() {
           className="mb-2 flex items-center justify-between text-sm"
         >
           <span>Contribuție lunară suplimentară</span>
-          <b className="text-brand-medium">+{formatLei(state.extraContributionLei)}/lună</b>
+          <b className="text-[#5f4bb6] dark:text-[#a594f0]">
+            +{formatLei(state.extraContributionLei)}/lună
+          </b>
         </label>
 
         <input
@@ -320,10 +326,10 @@ export function ProgressScreen() {
           onChange={(e) =>
             updateAppState({ extraContributionLei: Number(e.target.value) })
           }
-          className="w-full accent-brand-primary"
+          className="w-full accent-[#6f5cc1]"
         />
 
-        <div className="mt-2 flex justify-between text-[11px] text-ink-muted">
+        <div className="mt-2 flex justify-between text-[11px] text-[#858090] dark:text-[#a39cab]">
           {[0, 100, 250, 500].map((val) => (
             <button
               key={val}
@@ -331,8 +337,8 @@ export function ProgressScreen() {
               onClick={() => updateAppState({ extraContributionLei: val })}
               className={`rounded-full px-2 py-0.5 font-medium transition-colors ${
                 state.extraContributionLei === val
-                  ? 'bg-brand-deep text-white'
-                  : 'bg-brand-soft text-ink-subtle'
+                  ? 'bg-[#33256c] text-white'
+                  : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
               }`}
             >
               +{val} lei
@@ -340,16 +346,18 @@ export function ProgressScreen() {
           ))}
         </div>
 
-        <p className="mt-3 text-xs text-ink-muted">
+        <p className="mt-3 text-xs text-[#858090] dark:text-[#a39cab]">
           Money saved this month: <b>{formatLei(moneySavedThisMonthLei)}</b> + supliment slider{' '}
           <b>{formatLei(state.extraContributionLei)}</b> ={' '}
           <b>{formatLei(totalMonthlyContributionLei)}/lună</b>
         </p>
 
-        <div className="mt-5 border-t border-line-dashed pt-4">
-          <div className="mb-2 flex items-center justify-between text-xs text-ink-muted">
+        <div className="mt-5 border-t border-dashed border-[#e2dfe8] pt-4 dark:border-[#353042]">
+          <div className="mb-2 flex items-center justify-between text-xs text-[#858090] dark:text-[#a39cab]">
             <span>Profil de risc simulat (piața din România)</span>
-            <span className="font-semibold text-brand-medium">{riskMeta.labelRo}</span>
+            <span className="font-semibold text-[#5f4bb6] dark:text-[#a594f0]">
+              {riskMeta.labelRo}
+            </span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {(['low', 'medium', 'high'] as RiskLevel[]).map((level) => (
@@ -359,41 +367,47 @@ export function ProgressScreen() {
                 onClick={() => updateAppState({ risk: level })}
                 className={`rounded-xl py-2 text-xs font-semibold transition-colors ${
                   state.risk === level
-                    ? 'bg-brand-deep text-white'
-                    : 'bg-brand-soft text-ink-subtle'
+                    ? 'bg-[#33256c] text-white'
+                    : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
                 }`}
               >
                 {RISK_CONFIG[level].labelRo} ({RISK_CONFIG[level].nominalReturnPct.toLocaleString('ro-RO')}%)
               </button>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-ink-muted">
+          <p className="mt-2 text-[11px] text-[#858090] dark:text-[#a39cab]">
             Coș: {riskMeta.instrumentsSummaryRo}
           </p>
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-sm text-ink-muted">Randament nominal mediu (RON)</span>
-          <b className="text-sm text-brand-medium">
+          <span className="text-sm text-[#858090] dark:text-[#a39cab]">
+            Randament nominal mediu (RON)
+          </span>
+          <b className="text-sm text-[#5f4bb6] dark:text-[#a594f0]">
             {riskMeta.nominalReturnPct.toLocaleString('ro-RO')}% / an
           </b>
         </div>
         <div className="mt-2.5 flex items-center justify-between">
-          <span className="text-sm text-ink-muted">Inflație medie pe termen lung (BNR/INS)</span>
+          <span className="text-sm text-[#858090] dark:text-[#a39cab]">
+            Inflație medie pe termen lung (BNR/INS)
+          </span>
           <b className="text-sm">{riskMeta.inflationPct.toLocaleString('ro-RO')}% / an</b>
         </div>
         <div className="mt-2.5 flex items-center justify-between">
-          <span className="text-sm text-ink-muted">Randament real net (peste inflație)</span>
-          <b className="text-sm text-mint-text">
+          <span className="text-sm text-[#858090] dark:text-[#a39cab]">
+            Randament real net (peste inflație)
+          </span>
+          <b className="text-sm text-[#438565] dark:text-[#6bc495]">
             +{realNetReturnPct.toLocaleString('ro-RO')}% / an
           </b>
         </div>
 
-        <div className="mt-4 border-t border-line-dashed pt-3">
+        <div className="mt-4 border-t border-dashed border-[#e2dfe8] pt-3 dark:border-[#353042]">
           <button
             type="button"
             onClick={() => setShowRoRates((v) => !v)}
-            className="flex w-full items-center justify-between text-left text-xs font-semibold text-brand-accent"
+            className="flex w-full items-center justify-between text-left text-xs font-semibold text-[#6b57bd] dark:text-[#a594f0]"
           >
             <span>
               {showRoRates
@@ -407,19 +421,21 @@ export function ProgressScreen() {
               {ROMANIAN_INSTRUMENTS.map((inst) => (
                 <div
                   key={inst.name}
-                  className="flex items-start justify-between gap-2 border-b border-brand-lavender/20 pb-2 last:border-0 last:pb-0"
+                  className="flex items-start justify-between gap-2 border-b border-[#8c7ad9]/20 pb-2 last:border-0 last:pb-0"
                 >
                   <div>
-                    <p className="font-semibold text-brand-deep dark:text-white">{inst.name}</p>
-                    <p className="text-[11px] text-ink-muted">
+                    <p className="font-semibold text-[#33256c] dark:text-white">{inst.name}</p>
+                    <p className="text-[11px] text-[#858090] dark:text-[#a39cab]">
                       {inst.taxNote} · Sursă: {inst.source}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="rounded-full bg-brand-deep px-2 py-0.5 text-[11px] font-semibold text-white dark:bg-[#5f4bb6]">
+                    <span className="rounded-full bg-[#33256c] px-2 py-0.5 text-[11px] font-semibold text-white dark:bg-[#5f4bb6]">
                       {inst.ratePct.toLocaleString('ro-RO')}%/an
                     </span>
-                    <p className="mt-0.5 text-[10px] text-ink-muted">{inst.rangeText}</p>
+                    <p className="mt-0.5 text-[10px] text-[#858090] dark:text-[#a39cab]">
+                      {inst.rangeText}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -431,7 +447,7 @@ export function ProgressScreen() {
       <Card className="mt-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-semibold">Toată pensia ta într-un loc</h2>
-          <span className="text-xs font-semibold text-brand-medium">
+          <span className="text-xs font-semibold text-[#5f4bb6] dark:text-[#a594f0]">
             ~{formatLei(totalPensionMonthlyLei)}/lună
           </span>
         </div>
@@ -450,8 +466,8 @@ export function ProgressScreen() {
           {allocationItems.map((item) => (
             <div key={item.label} className="flex items-center gap-2 text-sm">
               <span className={`size-2.5 shrink-0 rounded-full ${item.color}`} />
-              <span className="flex-1 text-ink-subtle">{item.label}</span>
-              <span className="text-xs text-ink-muted">{item.percent}%</span>
+              <span className="flex-1 text-[#706b7b] dark:text-[#aaa4b6]">{item.label}</span>
+              <span className="text-xs text-[#858090] dark:text-[#a39cab]">{item.percent}%</span>
               <b>{item.value}</b>
             </div>
           ))}
@@ -465,13 +481,13 @@ export function ProgressScreen() {
             <button
               type="button"
               onClick={() => updateAppState({ excludedMonths: [] })}
-              className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-accent"
+              className="inline-flex items-center gap-1 rounded-full bg-[#f1effa] px-2.5 py-1 text-xs font-semibold text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]"
             >
               <RotateCcw size={12} /> Restaurează tot ({excludedCount})
             </button>
           )}
         </div>
-        <p className="mb-4 text-xs text-ink-muted">
+        <p className="mb-4 text-xs text-[#858090] dark:text-[#a39cab]">
           Dacă nu ai finalizat o investiție promisă Agentului AI, o poți elimina din grafic pentru o
           reprezentare 100% realistă.
         </p>
@@ -481,10 +497,10 @@ export function ProgressScreen() {
             <div
               key={item.id}
               className={`flex items-center gap-3 rounded-2xl p-2 transition-opacity ${
-                item.excluded ? 'bg-brand-soft/50 opacity-55' : ''
+                item.excluded ? 'bg-[#f1effa]/50 opacity-55 dark:bg-[#2b253a]/50' : ''
               }`}
             >
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-accent">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#f1effa] text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]">
                 <Target size={16} />
               </div>
 
@@ -492,7 +508,7 @@ export function ProgressScreen() {
                 <p className={`text-sm font-medium ${item.excluded ? 'line-through' : ''}`}>
                   {item.monthRo}
                 </p>
-                <p className="text-xs text-ink-faint">
+                <p className="text-xs text-[#96909f]">
                   {item.excluded ? 'Investiție exclusă din grafic' : item.destinationRo}
                 </p>
               </div>
@@ -501,7 +517,7 @@ export function ProgressScreen() {
                 <p className={`text-sm font-semibold ${item.excluded ? 'line-through' : ''}`}>
                   +{formatNumberRo(item.days)} zile
                 </p>
-                <p className="text-xs text-mint-text">{money(item.amountLei)}</p>
+                <p className="text-xs text-[#438565] dark:text-[#6bc495]">{money(item.amountLei)}</p>
               </div>
 
               <button
@@ -514,8 +530,8 @@ export function ProgressScreen() {
                 onClick={() => toggleMonthExclusion(item.id)}
                 className={`flex size-8 shrink-0 items-center justify-center rounded-xl border transition-colors ${
                   item.excluded
-                    ? 'border-brand-lavender/40 bg-white text-brand-accent dark:bg-[#1e1a29]'
-                    : 'border-transparent bg-brand-soft text-ink-muted hover:text-destructive'
+                    ? 'border-[#8c7ad9]/40 bg-white text-[#6b57bd] dark:bg-[#1e1a29] dark:text-[#a594f0]'
+                    : 'border-transparent bg-[#f1effa] text-[#858090] hover:text-red-600 dark:bg-[#2b253a] dark:text-[#a39cab]'
                 }`}
               >
                 {item.excluded ? <RotateCcw size={14} /> : <Trash2 size={14} />}

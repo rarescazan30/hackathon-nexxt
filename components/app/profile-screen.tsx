@@ -41,7 +41,7 @@ export function ProfileScreen() {
 
   const [draftFullName, setDraftFullName] = useState(state.fullName)
   const [draftAge, setDraftAge] = useState(String(state.age))
-  const [draftCity, setDraftCity] = useState(state.city)
+  const [draftCity, setDraftCity] = useState(String(state.city))
   const [draftSalaryLei, setDraftSalaryLei] = useState(String(Math.round(state.salaryBani / 100)))
 
   const initials = state.fullName
@@ -96,12 +96,12 @@ export function ProfileScreen() {
       <div className="flex flex-col gap-4">
         <Card>
           <div className="flex items-center gap-3">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#e9e2ff] text-lg font-semibold text-brand-medium dark:bg-brand-soft">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#e9e2ff] text-lg font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
               {initials || 'AP'}
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="truncate font-semibold">{state.fullName}</h2>
-              <p className="text-sm text-ink-muted">
+              <p className="text-sm text-[#858090] dark:text-[#a39cab]">
                 {state.age} ani · {state.city} · Salariu net{' '}
                 {formatLei(Math.round(state.salaryBani / 100))}
               </p>
@@ -112,8 +112,8 @@ export function ProfileScreen() {
               onClick={handleOpenProfileEdit}
               className={`ml-auto flex size-9 items-center justify-center rounded-xl transition-colors ${
                 editingProfile
-                  ? 'bg-brand-deep text-white'
-                  : 'bg-brand-soft text-brand-accent'
+                  ? 'bg-[#33256c] text-white'
+                  : 'bg-[#f1effa] text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]'
               }`}
             >
               <Settings size={16} />
@@ -121,22 +121,22 @@ export function ProfileScreen() {
           </div>
 
           {editingProfile && (
-            <div className="mt-4 space-y-3 border-t border-line-dashed pt-4 text-sm">
+            <div className="mt-4 space-y-3 border-t border-dashed border-[#e2dfe8] pt-4 text-sm dark:border-[#353042]">
               <div>
-                <label className="mb-1 block text-xs font-medium text-ink-muted">
+                <label className="mb-1 block text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                   Nume complet
                 </label>
                 <input
                   type="text"
                   value={draftFullName}
                   onChange={(e) => setDraftFullName(e.target.value)}
-                  className="w-full rounded-xl border border-line-dashed bg-brand-soft/40 px-3 py-2 text-sm outline-none focus:border-brand-primary"
+                  className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3 py-2 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-ink-muted">
+                  <label className="mb-1 block text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                     Vârstă (18–60)
                   </label>
                   <input
@@ -145,24 +145,24 @@ export function ProfileScreen() {
                     max={60}
                     value={draftAge}
                     onChange={(e) => setDraftAge(e.target.value)}
-                    className="w-full rounded-xl border border-line-dashed bg-brand-soft/40 px-3 py-2 text-sm outline-none focus:border-brand-primary"
+                    className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3 py-2 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-ink-muted">
+                  <label className="mb-1 block text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                     Oraș
                   </label>
                   <input
                     type="text"
                     value={draftCity}
                     onChange={(e) => setDraftCity(e.target.value)}
-                    className="w-full rounded-xl border border-line-dashed bg-brand-soft/40 px-3 py-2 text-sm outline-none focus:border-brand-primary"
+                    className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3 py-2 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-medium text-ink-muted">
+                <label className="mb-1 block text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                   Salariu net lunar (lei)
                 </label>
                 <input
@@ -172,7 +172,7 @@ export function ProfileScreen() {
                   step={100}
                   value={draftSalaryLei}
                   onChange={(e) => setDraftSalaryLei(e.target.value)}
-                  className="w-full rounded-xl border border-line-dashed bg-brand-soft/40 px-3 py-2 text-sm outline-none focus:border-brand-primary"
+                  className="w-full rounded-xl border border-[#e2dfe8] bg-[#f1effa]/40 px-3 py-2 text-sm outline-none focus:border-[#6f5cc1] dark:border-[#353042] dark:bg-[#2b253a]/40"
                 />
               </div>
 
@@ -180,14 +180,14 @@ export function ProfileScreen() {
                 <button
                   type="button"
                   onClick={() => setEditingProfile(false)}
-                  className="rounded-xl bg-brand-soft px-3.5 py-2 text-xs font-semibold text-ink-subtle"
+                  className="rounded-xl bg-[#f1effa] px-3.5 py-2 text-xs font-semibold text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]"
                 >
                   Anulează
                 </button>
                 <button
                   type="button"
                   onClick={handleSaveProfile}
-                  className="inline-flex items-center gap-1 rounded-xl bg-brand-deep px-4 py-2 text-xs font-semibold text-white"
+                  className="inline-flex items-center gap-1 rounded-xl bg-[#33256c] px-4 py-2 text-xs font-semibold text-white"
                 >
                   <Check size={14} /> Salvează
                 </button>
@@ -203,22 +203,22 @@ export function ProfileScreen() {
             onClick={() => toggleSection('risk')}
             className="flex w-full items-center gap-3 text-left"
           >
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-accent">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#f1effa] text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]">
               <Target size={18} />
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold">Profil de risc</p>
-              <p className="text-xs text-ink-muted">{riskMeta.subtitleRo}</p>
+              <p className="text-xs text-[#858090] dark:text-[#a39cab]">{riskMeta.subtitleRo}</p>
             </div>
             {openSection === 'risk' ? (
-              <ChevronDown className="text-ink-muted" size={17} />
+              <ChevronDown className="text-[#858090]" size={17} />
             ) : (
-              <ChevronRight className="text-ink-muted" size={17} />
+              <ChevronRight className="text-[#858090]" size={17} />
             )}
           </button>
 
           {openSection === 'risk' && (
-            <div className="mt-4 space-y-3 border-t border-line-dashed pt-4">
+            <div className="mt-4 space-y-3 border-t border-dashed border-[#e2dfe8] pt-4 dark:border-[#353042]">
               <div className="grid grid-cols-3 gap-2">
                 {(['low', 'medium', 'high'] as RiskLevel[]).map((level) => {
                   const cfg = RISK_CONFIG[level]
@@ -230,14 +230,14 @@ export function ProfileScreen() {
                       onClick={() => updateAppState({ risk: level })}
                       className={`rounded-xl p-2.5 text-left transition-colors ${
                         active
-                          ? 'bg-brand-deep text-white'
-                          : 'bg-brand-soft text-ink-subtle'
+                          ? 'bg-[#33256c] text-white'
+                          : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
                       }`}
                     >
                       <p className="text-xs font-semibold">{cfg.labelRo}</p>
                       <p
                         className={`mt-0.5 text-[11px] ${
-                          active ? 'text-white/80' : 'text-ink-muted'
+                          active ? 'text-white/80' : 'text-[#858090] dark:text-[#a39cab]'
                         }`}
                       >
                         ~{cfg.nominalReturnPct.toLocaleString('ro-RO')}%/an
@@ -246,7 +246,7 @@ export function ProfileScreen() {
                   )
                 })}
               </div>
-              <p className="text-xs text-ink-muted">
+              <p className="text-xs text-[#858090] dark:text-[#a39cab]">
                 Alocare țintă România: <b>{riskMeta.instrumentsSummaryRo}</b> (inflație medie BNR/INS{' '}
                 <b>{riskMeta.inflationPct.toLocaleString('ro-RO')}%/an</b>).
               </p>
@@ -258,14 +258,14 @@ export function ProfileScreen() {
         <Card>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Regulile tale</h2>
-            <span className="rounded-full bg-mint-soft px-2.5 py-1 text-xs font-semibold text-mint-text">
+            <span className="rounded-full bg-[#e3f5e9] px-2.5 py-1 text-xs font-semibold text-[#438565] dark:bg-[#1e3629] dark:text-[#6bc495]">
               {formatLei(moneySavedThisMonthLei)} luna asta ({formatNumberRo(acquiredDays)}z total)
             </span>
           </div>
 
           <div className="flex flex-col gap-4">
             {/* Round-up rule */}
-            <div className="rounded-2xl border border-line-dashed p-3">
+            <div className="rounded-2xl border border-[#e2dfe8] p-3 dark:border-[#353042]">
               <button
                 type="button"
                 onClick={() => toggleSection('roundup')}
@@ -282,21 +282,21 @@ export function ProfileScreen() {
                           state.roundUpStepLei === 1 ? 'leu' : 'lei'
                         }${state.roundUpMultiplier > 1 ? ` (×${state.roundUpMultiplier})` : ''}`}
                   </p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-[#858090] dark:text-[#a39cab]">
                     La fiecare plată cu cardul · {formatBaniAsLei(roundUpsBani)} strânși luna asta
                   </p>
                 </div>
                 {openSection === 'roundup' ? (
-                  <ChevronDown size={16} className="text-ink-muted" />
+                  <ChevronDown size={16} className="text-[#858090]" />
                 ) : (
-                  <ChevronRight size={16} className="text-ink-muted" />
+                  <ChevronRight size={16} className="text-[#858090]" />
                 )}
               </button>
 
               {openSection === 'roundup' && (
-                <div className="mt-3 space-y-3 border-t border-line-dashed pt-3">
+                <div className="mt-3 space-y-3 border-t border-dashed border-[#e2dfe8] pt-3 dark:border-[#353042]">
                   <div>
-                    <p className="mb-1.5 text-xs font-medium text-ink-muted">
+                    <p className="mb-1.5 text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                       Prag de rotunjire plată card
                     </p>
                     <div className="grid grid-cols-4 gap-1.5">
@@ -307,8 +307,8 @@ export function ProfileScreen() {
                           onClick={() => updateAppState({ roundUpStepLei: step })}
                           className={`rounded-xl py-2 text-xs font-semibold transition-colors ${
                             state.roundUpStepLei === step
-                              ? 'bg-brand-deep text-white'
-                              : 'bg-brand-soft text-ink-subtle'
+                              ? 'bg-[#33256c] text-white'
+                              : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
                           }`}
                         >
                           {step === 0 ? 'Oprit' : `${step} ${step === 1 ? 'leu' : 'lei'}`}
@@ -318,7 +318,7 @@ export function ProfileScreen() {
                   </div>
 
                   <div>
-                    <p className="mb-1.5 text-xs font-medium text-ink-muted">
+                    <p className="mb-1.5 text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                       Multiplicator rotunjire (accelerează economisirea)
                     </p>
                     <div className="grid grid-cols-3 gap-2">
@@ -330,8 +330,8 @@ export function ProfileScreen() {
                           onClick={() => updateAppState({ roundUpMultiplier: mult })}
                           className={`rounded-xl py-1.5 text-xs font-semibold transition-colors ${
                             state.roundUpMultiplier === mult && state.roundUpStepLei !== 0
-                              ? 'bg-brand-primary text-white'
-                              : 'bg-brand-soft text-ink-subtle disabled:opacity-40'
+                              ? 'bg-[#6f5cc1] text-white'
+                              : 'bg-[#f1effa] text-[#706b7b] disabled:opacity-40 dark:bg-[#2b253a] dark:text-[#aaa4b6]'
                           }`}
                         >
                           ×{mult} ({mult === 1 ? 'Standard' : mult === 2 ? 'Dublu' : 'Triplu'})
@@ -344,32 +344,32 @@ export function ProfileScreen() {
             </div>
 
             {/* Salary % rule */}
-            <div className="rounded-2xl border border-line-dashed p-3">
+            <div className="rounded-2xl border border-[#e2dfe8] p-3 dark:border-[#353042]">
               <button
                 type="button"
                 onClick={() => toggleSection('salary')}
                 className="flex w-full items-center gap-3 text-left"
               >
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-mint-soft text-mint-text">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#e3f5e9] text-[#438565] dark:bg-[#1e3629] dark:text-[#6bc495]">
                   <Banknote size={17} />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{state.salaryPercent}% din salariu</p>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-[#858090] dark:text-[#a39cab]">
                     În ziua de salariu · {formatBaniAsLei(paydayBani)} din{' '}
                     {formatBaniAsLei(state.salaryBani)}
                   </p>
                 </div>
                 {openSection === 'salary' ? (
-                  <ChevronDown size={16} className="text-ink-muted" />
+                  <ChevronDown size={16} className="text-[#858090]" />
                 ) : (
-                  <ChevronRight size={16} className="text-ink-muted" />
+                  <ChevronRight size={16} className="text-[#858090]" />
                 )}
               </button>
 
               {openSection === 'salary' && (
-                <div className="mt-3 border-t border-line-dashed pt-3">
-                  <p className="mb-1.5 text-xs font-medium text-ink-muted">
+                <div className="mt-3 border-t border-dashed border-[#e2dfe8] pt-3 dark:border-[#353042]">
+                  <p className="mb-1.5 text-xs font-medium text-[#858090] dark:text-[#a39cab]">
                     Procent transferat automat în ziua de salariu
                   </p>
                   <div className="grid grid-cols-5 gap-1.5">
@@ -380,8 +380,8 @@ export function ProfileScreen() {
                         onClick={() => updateAppState({ salaryPercent: pct })}
                         className={`rounded-xl py-2 text-xs font-semibold transition-colors ${
                           state.salaryPercent === pct
-                            ? 'bg-brand-deep text-white'
-                            : 'bg-brand-soft text-ink-subtle'
+                            ? 'bg-[#33256c] text-white'
+                            : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
                         }`}
                       >
                         {pct}%
@@ -397,12 +397,12 @@ export function ProfileScreen() {
         {/* Connected Bank PSD2 Card */}
         <Card>
           <div className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-mint-soft text-mint-text">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#e3f5e9] text-[#438565] dark:bg-[#1e3629] dark:text-[#6bc495]">
               <Landmark size={18} />
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold">{state.bankName}</p>
-              <p className="text-xs text-ink-muted">
+              <p className="text-xs text-[#858090] dark:text-[#a39cab]">
                 {state.bankConfirmedDaysAgo === 0
                   ? 'Acces PSD2 reconfirmat azi · valabil 90 zile'
                   : `Acces reconfirmat acum ${state.bankConfirmedDaysAgo} zile`}
@@ -415,7 +415,7 @@ export function ProfileScreen() {
             type="button"
             disabled={bankReconfirming}
             onClick={handleReconfirmBank}
-            className="mt-5 w-full rounded-xl border border-line-dashed py-3 text-sm font-semibold text-brand-medium transition-colors hover:bg-brand-soft disabled:opacity-60"
+            className="mt-5 w-full rounded-xl border border-[#ddd8e6] py-3 text-sm font-semibold text-[#5f4bb6] transition-colors hover:bg-[#f1effa] disabled:opacity-60 dark:border-[#353042] dark:text-[#a594f0] dark:hover:bg-[#2b253a]"
           >
             {bankReconfirming
               ? 'Se reconfirmă conexiunea PSD2...'
@@ -428,7 +428,7 @@ export function ProfileScreen() {
         {/* Dark mode & Reset Demo State */}
         <Card>
           <div className="flex items-center gap-3">
-            <Moon size={18} className="text-brand-accent" />
+            <Moon size={18} className="text-[#6b57bd] dark:text-[#a594f0]" />
             <span className="flex-1 text-sm font-medium">Aspect întunecat</span>
             <button
               type="button"
@@ -437,7 +437,7 @@ export function ProfileScreen() {
               aria-label="Comută aspectul întunecat"
               onClick={() => updateAppState({ darkMode: !state.darkMode })}
               className={`flex h-7 w-12 items-center rounded-full p-1 transition-colors ${
-                state.darkMode ? 'bg-brand-primary' : 'bg-[#dcd8e3]'
+                state.darkMode ? 'bg-[#6f5cc1]' : 'bg-[#dcd8e3]'
               }`}
             >
               <span
@@ -448,11 +448,11 @@ export function ProfileScreen() {
             </button>
           </div>
 
-          <div className="mt-4 border-t border-line-dashed pt-3">
+          <div className="mt-4 border-t border-dashed border-[#e2dfe8] pt-3 dark:border-[#353042]">
             <button
               type="button"
               onClick={resetAppState}
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-soft py-2.5 text-xs font-semibold text-ink-subtle transition-colors hover:text-brand-medium"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#f1effa] py-2.5 text-xs font-semibold text-[#706b7b] transition-colors hover:text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#aaa4b6]"
             >
               <RotateCcw size={13} /> Resetează toate setările la valorile inițiale
             </button>

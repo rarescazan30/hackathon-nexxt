@@ -367,7 +367,6 @@ export function useDerivedFinancials() {
   ]
 
   // Projection series from user's current age (e.g. 26) to 65 (13 points)
-  // Baseline medium risk: 9.2% nominal - 4.0% inflation = 5.2% real return in RON
   const retirementAge = 65
   const totalYears = Math.max(6, retirementAge - state.age)
   const steps = 12
@@ -449,14 +448,14 @@ export function useDerivedFinancials() {
       lei: statePensionLei,
       value: formatLei(statePensionLei),
       percent: Math.round((statePensionLei / totalPensionMonthlyLei) * 100),
-      color: 'bg-brand-deep',
+      color: 'bg-[#33256c]',
     },
     {
       label: 'Pilonul 2 (8,1%/an medie ASF)',
       lei: pillar2Lei,
       value: formatLei(pillar2Lei),
       percent: Math.round((pillar2Lei / totalPensionMonthlyLei) * 100),
-      color: 'bg-brand-lavender',
+      color: 'bg-[#8c7ad9]',
     },
     {
       label: 'Pilonul 3 (7,9%/an medie ASF)',
@@ -470,7 +469,7 @@ export function useDerivedFinancials() {
       lei: investmentsLei,
       value: formatLei(investmentsLei),
       percent: Math.round((investmentsLei / totalPensionMonthlyLei) * 100),
-      color: 'bg-peach',
+      color: 'bg-[#38bdf8]',
     },
     {
       label: 'Rotunjiri active luna asta',
@@ -484,7 +483,7 @@ export function useDerivedFinancials() {
           Math.round((pillar3Lei / totalPensionMonthlyLei) * 100) -
           Math.round((investmentsLei / totalPensionMonthlyLei) * 100)
       ),
-      color: 'bg-mint-hero',
+      color: 'bg-[#bfe8d1]',
     },
   ]
 
@@ -601,8 +600,8 @@ export function DaysHero() {
 
   return (
     <>
-      <Card className="relative overflow-hidden !bg-brand-deep text-white">
-        <div className="absolute -right-12 -top-16 size-44 rounded-full bg-brand-lavender/30 blur-2xl" />
+      <Card className="relative overflow-hidden !bg-[#33256c] text-white">
+        <div className="absolute -right-12 -top-16 size-44 rounded-full bg-[#8c7ad9]/30 blur-2xl" />
         <div className="relative">
           <div className="mb-8 flex items-center justify-between gap-2">
             <span className="text-sm font-medium text-white/80">
@@ -635,7 +634,7 @@ export function DaysHero() {
           </p>
 
           <div className="mt-5 flex items-center justify-between">
-            <span className="rounded-full bg-mint-hero px-3 py-1.5 text-xs font-semibold text-mint-deep">
+            <span className="rounded-full bg-[#bfe8d1] px-3 py-1.5 text-xs font-semibold text-[#236243]">
               +{formatNumberRo(daysGainedThisMonth)} luna asta
             </span>
             <span className="text-xs text-white/55">
@@ -666,13 +665,13 @@ export function DaysHero() {
               <button
                 aria-label="Închide explicația"
                 onClick={() => setOpen(false)}
-                className="rounded-full p-1 hover:bg-brand-soft"
+                className="rounded-full p-1 hover:bg-[#f1effa] dark:hover:bg-[#2b253a]"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <p className="text-sm leading-6 text-ink-subtle">
+            <p className="text-sm leading-6 text-[#706b7b] dark:text-[#aaa4b6]">
               Estimăm câte zile de cheltuieli la pensie ai acoperite deja (
               <b>{formatNumberRo(acquiredDays)} zile</b>, interval estimat{' '}
               <b>
@@ -696,16 +695,16 @@ export function DaysHero() {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              <span className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand-medium">
+              <span className="rounded-full bg-[#f1effa] px-3 py-1.5 text-xs font-medium text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
                 ASF · Pilonul 2 (8,1%) & 3 (7,9%)
               </span>
-              <span className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand-medium">
+              <span className="rounded-full bg-[#f1effa] px-3 py-1.5 text-xs font-medium text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
                 BVB · BET-TR (13,4%)
               </span>
-              <span className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand-medium">
+              <span className="rounded-full bg-[#f1effa] px-3 py-1.5 text-xs font-medium text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
                 MF · Fidelis/Tezaur (6,8%)
               </span>
-              <span className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-medium text-brand-medium">
+              <span className="rounded-full bg-[#f1effa] px-3 py-1.5 text-xs font-medium text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
                 BNR / INS · Inflație (4,0%)
               </span>
             </div>
@@ -767,7 +766,7 @@ export function HomeAgentInvite({ setTab }: { setTab: (t: Tab) => void }) {
               }}
               placeholder="Scrie-i Agentului..."
               aria-label="Scrie un mesaj Agentului AI"
-              className="min-w-0 flex-1 bg-transparent px-2 text-sm text-foreground outline-none placeholder:text-[#8e85a6]"
+              className="min-w-0 flex-1 bg-transparent px-2 text-sm text-[#292431] outline-none placeholder:text-[#8e85a6] dark:text-white"
             />
             <button
               onClick={() => openAgent()}
@@ -846,7 +845,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
         <Card>
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[.14em] text-brand-lavender">
+              <p className="text-xs font-semibold uppercase tracking-[.14em] text-[#8c7ad9]">
                 Money saved this month
               </p>
               <button
@@ -857,11 +856,11 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                 <h2 className="text-2xl font-semibold">
                   {formatBaniAsLei(moneySavedThisMonthBani)}
                 </h2>
-                <span className="rounded-full bg-mint-soft px-2.5 py-0.5 text-xs font-semibold text-mint-text">
+                <span className="rounded-full bg-[#e3f5e9] px-2.5 py-0.5 text-xs font-semibold text-[#438565] dark:bg-[#1e3629] dark:text-[#6bc495]">
                   +{formatNumberRo(daysGainedThisMonth)} zile
                 </span>
               </button>
-              <p className="mt-1 text-sm text-ink-muted">
+              <p className="mt-1 text-sm text-[#858090] dark:text-[#a39cab]">
                 puși deoparte în octombrie · țintă {formatBaniAsLei(monthlyGoalBani)} ({jarProgressPct}
                 %)
               </p>
@@ -876,39 +875,39 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
             </button>
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-muted">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#858090] dark:text-[#a39cab]">
             <span>{formatBaniAsLei(roundUpsBani)} rotunjiri</span>
             <span>
               {formatBaniAsLei(paydayBani)} salariu ({state.salaryPercent}%)
             </span>
             {bonusPillar3Bani > 0 && (
-              <span className="font-semibold text-mint-text">
+              <span className="font-semibold text-[#438565] dark:text-[#6bc495]">
                 +{formatBaniAsLei(bonusPillar3Bani)} Pilon 3
               </span>
             )}
           </div>
 
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-brand-soft">
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#f1effa] dark:bg-[#2b253a]">
             <div
-              className="h-full rounded-full bg-brand-lavender transition-all duration-300"
+              className="h-full rounded-full bg-[#8c7ad9] transition-all duration-300"
               style={{ width: `${jarProgressPct}%` }}
             />
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-xs text-ink-muted">
+          <div className="mt-3 flex items-center justify-between text-xs text-[#858090] dark:text-[#a39cab]">
             <span>Transfer automat pe 31 octombrie</span>
             <button
               type="button"
               onClick={() => setTab('profile')}
-              className="font-semibold text-brand-accent hover:underline"
+              className="font-semibold text-[#6b57bd] hover:underline dark:text-[#a594f0]"
             >
               Schimbă regulile →
             </button>
           </div>
 
           {showSavedExplain && (
-            <div className="mt-4 rounded-2xl bg-brand-soft p-3.5 text-xs leading-5 text-ink-subtle">
-              <p className="font-semibold text-brand-medium">
+            <div className="mt-4 rounded-2xl bg-[#f1effa] p-3.5 text-xs leading-5 text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]">
+              <p className="font-semibold text-[#5f4bb6] dark:text-[#a594f0]">
                 Cum se calculează Money saved this month:
               </p>
               <p className="mt-1">
@@ -924,7 +923,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                   • <b>Bonus Pilonul 3 aprobat:</b> {formatBaniAsLei(bonusPillar3Bani)}
                 </p>
               )}
-              <p className="mt-1 text-[11px] text-ink-muted">
+              <p className="mt-1 text-[11px] text-[#858090] dark:text-[#a39cab]">
                 Sursă: Tranzacții PSD2 simulate (Banca Transilvania) & regulă automată Stripe test mode.
               </p>
             </div>
@@ -938,7 +937,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
               <button
                 type="button"
                 onClick={handleSimulatePayment}
-                className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-accent transition-transform active:scale-95"
+                className="inline-flex items-center gap-1 rounded-full bg-[#f1effa] px-2.5 py-1 text-xs font-semibold text-[#6b57bd] transition-transform active:scale-95 dark:bg-[#2b253a] dark:text-[#a594f0]"
               >
                 <Plus size={13} />
                 Plată test
@@ -946,7 +945,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
               <button
                 type="button"
                 onClick={() => setShowAllActivity((prev) => !prev)}
-                className="text-xs font-semibold text-brand-accent"
+                className="text-xs font-semibold text-[#6b57bd] dark:text-[#a594f0]"
               >
                 {showAllActivity ? 'Restrânge' : `Vezi tot (${dynamicActivity.length})`}
               </button>
@@ -956,7 +955,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
           <div className="flex flex-col gap-4">
             {visibleActivity.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
-                <div className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand-accent">
+                <div className="flex size-9 items-center justify-center rounded-xl bg-[#f1effa] text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]">
                   {item.icon === 'salary' ? (
                     <Banknote size={17} />
                   ) : item.icon === 'coffee' ? (
@@ -967,9 +966,11 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{item.label}</p>
-                  <p className="text-xs text-ink-faint">{item.detail}</p>
+                  <p className="text-xs text-[#96909f]">{item.detail}</p>
                 </div>
-                <span className="text-sm font-semibold text-mint-text">{item.amount}</span>
+                <span className="text-sm font-semibold text-[#438565] dark:text-[#6bc495]">
+                  {item.amount}
+                </span>
               </div>
             ))}
           </div>
@@ -977,15 +978,15 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
 
         <Card className="border-[#eadcf4] bg-[#faf7ff] dark:border-white/10 dark:bg-[#262035]">
           <div className="flex gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#e9e2ff] text-brand-accent dark:bg-brand-soft">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-[#e9e2ff] text-[#6b57bd] dark:bg-[#2b253a] dark:text-[#a594f0]">
               {state.suggestionStatus === 'accepted' ? (
-                <CheckCircle2 size={18} className="text-mint-text" />
+                <CheckCircle2 size={18} className="text-[#438565] dark:text-[#6bc495]" />
               ) : (
                 <Sparkles size={18} />
               )}
             </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[.14em] text-brand-lavender">
+              <p className="text-xs font-semibold uppercase tracking-[.14em] text-[#8c7ad9]">
                 O sugestie de la agent
               </p>
 
@@ -999,7 +1000,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                     <button
                       type="button"
                       onClick={() => updateAppState({ suggestionStatus: 'accepted' })}
-                      className="rounded-full bg-brand-deep px-4 py-2 text-xs font-semibold text-white transition-transform active:scale-95"
+                      className="rounded-full bg-[#33256c] px-4 py-2 text-xs font-semibold text-white transition-transform active:scale-95"
                     >
                       Da, adaugă +50 lei
                     </button>
@@ -1012,14 +1013,14 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                         })
                         setTab('agent')
                       }}
-                      className="rounded-full border border-brand-lavender/40 bg-white px-4 py-2 text-xs font-semibold text-brand-accent dark:bg-[#1e1a29]"
+                      className="rounded-full border border-[#8c7ad9]/40 bg-white px-4 py-2 text-xs font-semibold text-[#6b57bd] dark:bg-[#1e1a29] dark:text-[#a594f0]"
                     >
                       Întreabă Agentul
                     </button>
                     <button
                       type="button"
                       onClick={() => updateAppState({ suggestionStatus: 'dismissed' })}
-                      className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-ink-muted dark:bg-[#1e1a29]"
+                      className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#858090] dark:bg-[#1e1a29] dark:text-[#a39cab]"
                     >
                       Nu acum
                     </button>
@@ -1029,7 +1030,7 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
 
               {state.suggestionStatus === 'accepted' && (
                 <>
-                  <p className="mt-2 text-sm font-medium leading-5 text-mint-text">
+                  <p className="mt-2 text-sm font-medium leading-5 text-[#438565] dark:text-[#6bc495]">
                     Ai adăugat +50 lei în Pilonul 3! Money saved this month a crescut la{' '}
                     <b>{formatBaniAsLei(moneySavedThisMonthBani)}</b> (+
                     {formatNumberRo(daysGainedThisMonth)} zile luna asta).
@@ -1038,14 +1039,14 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
                     <button
                       type="button"
                       onClick={() => setTab('progress')}
-                      className="rounded-full bg-brand-deep px-3.5 py-1.5 text-xs font-semibold text-white"
+                      className="rounded-full bg-[#33256c] px-3.5 py-1.5 text-xs font-semibold text-white"
                     >
                       Vezi efectul în Progres →
                     </button>
                     <button
                       type="button"
                       onClick={() => updateAppState({ suggestionStatus: 'pending' })}
-                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink-muted dark:bg-[#1e1a29]"
+                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#858090] dark:bg-[#1e1a29] dark:text-[#a39cab]"
                     >
                       <RotateCcw size={12} /> Anulează
                     </button>
@@ -1055,13 +1056,13 @@ export function HomeScreen({ setTab }: { setTab: (t: Tab) => void }) {
 
               {state.suggestionStatus === 'dismissed' && (
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-xs text-[#858090] dark:text-[#a39cab]">
                     Sugestie amânată pentru luna aceasta.
                   </p>
                   <button
                     type="button"
                     onClick={() => updateAppState({ suggestionStatus: 'pending' })}
-                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-accent dark:bg-[#1e1a29]"
+                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#6b57bd] dark:bg-[#1e1a29] dark:text-[#a594f0]"
                   >
                     <RotateCcw size={12} /> Reafișează
                   </button>
