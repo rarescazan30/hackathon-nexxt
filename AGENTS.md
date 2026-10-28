@@ -66,7 +66,7 @@ app/             UI routes (pages, layouts)       → app/AGENTS.md
 app/api/         backend route handlers            → app/api/AGENTS.md
 components/app/  the prototype screens (one file per tab) + shell
 components/ui/   shadcn/ui primitives (add with `npx shadcn add <name>`)
-                                                    → components/AGENTS.md
+                                                  → components/AGENTS.md
 lib/contracts.ts shared Zod schemas + types (the contract)
 lib/rules/       deterministic money math          → lib/rules/AGENTS.md
 lib/ai/          agent, tools, prompts, provider   → lib/ai/AGENTS.md
@@ -91,6 +91,40 @@ the known cleanups the prototype needs.
 - Big decisions go in `docs/decisions.md` (one short entry each).
 - When an agent finishes a task, it says what it changed, what it didn't verify, and
   which files it touched.
+- **AI Agent Logging Rule:** Every AI agent working on this repo MUST record under
+  the `## Agent Activity Log` section in this file what was done, the exact date and
+  time, and all files created or modified.
+
+## Disjoint Tasks Roadmap
+
+To allow multiple agents and developers to work in parallel without merge conflicts, work is partitioned into 4 disjoint tasks:
+
+1. **Task 1: Core Financial Math Engine (`lib/rules/`)**
+   - Pure TypeScript calculations in integer bani (pure functions, no UI, no LLM, zero floats).
+   - Implement: `roundUp(amount, rule)`, `jarTotal(roundups, cap)`, `allocate(amount, riskLevel)` (split across Pillar 3 / ETF BET / Government bonds), compound projection bands (pessimistic / base / optimistic), and `daysOfFreedom()`.
+   - Unit tests against personas in `data/personas/`.
+   - **Files touched:** `lib/rules/*`.
+
+2. **Task 2: AI Assistant & Tool Calling (`lib/ai/` + `app/api/chat/`)**
+   - Vercel AI SDK integration with provider fallback (`gemini` → `groq` → `mock`).
+   - Implement tools (`calculate_projection`, `explain_number`, `search_knowledge`) calling `lib/rules/`.
+   - Wire `components/app/agent-screen.tsx` to `/api/chat` for streaming responses and tool result cards.
+   - **Files touched:** `lib/ai/*`, `app/api/chat/route.ts`, `components/app/agent-screen.tsx`.
+
+3. **Task 3: Dynamic Projections & Visualizations (`components/app/progress-screen.tsx` & `home-screen.tsx`)**
+   - Replace static hard-coded SVG curve with dynamic interactive charts responding to state.
+   - Connect monthly contribution slider (`+0` to `+500 lei/lună`) to recompute projected days of freedom live on screen.
+   - Clean up inline hex values into CSS tokens in `globals.css` and verify RO-RO locale formatting.
+   - **Files touched:** `components/app/progress-screen.tsx`, `components/app/home-screen.tsx`, `app/globals.css`.
+
+4. **Task 4: Onboarding & Risk Suitability Wizard (`app/onboarding/` or modal)**
+   - ~60-second onboarding flow: 3 MiFID II suitability questions → risk level (Scăzut / Mediu / Ridicat), round-up multiplier selection, and simulated card linking.
+   - Store settings to initialize user profile state before landing on the dashboard.
+   - **Files touched:** `components/app/onboarding-wizard.tsx` (or `app/onboarding/*`), `app/api/onboarding/*`.
+
+## Agent Activity Log
+
+- **2026-10-28 13:15:** Added 4 disjoint tasks roadmap and AI logging rule to AGENTS.md. Files modified: `AGENTS.md`.
 
 ## Commands
 
