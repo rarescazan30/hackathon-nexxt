@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jiti lib/rules/__tests__/rules.test.ts && jiti lib/rules/__tests__/personas.test.ts"
+    "test": "jiti lib/rules/__tests__/rules.test.ts && jiti lib/rules/__tests__/personas.test.ts && jiti lib/ai/__tests__/agent.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
