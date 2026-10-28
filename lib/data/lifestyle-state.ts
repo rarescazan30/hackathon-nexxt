@@ -24,6 +24,8 @@ export interface LifestyleInput {
   jars: { month: string; status: string; accepted_amount_bani: number | null; invested_at?: string | null }[]
   /** profiles.start_level: the highest starting level so far (the level never goes down). */
   storedStartLevel?: number | null
+  /** profiles.welcome_bonus_xp: XP given at sign-up (new accounts start near a level-up). */
+  welcomeBonusXp?: number
   /** Defaults to the current year. */
   year?: number
 }
@@ -67,7 +69,7 @@ export function lifestyleNumbers(input: LifestyleInput): LifestyleNumbers {
     .filter((jar) => (CONTRIBUTED_STATUSES as readonly string[]).includes(jar.status))
     .map((jar) => ({ month: jar.month, amountBani: jar.accepted_amount_bani ?? 0 }))
   const contributedBani = contributions.reduce((sum, c) => sum + c.amountBani, 0)
-  const level = levelState(startLevel, xpFromContributions(contributions, salary, income))
+  const level = levelState(startLevel, (input.welcomeBonusXp ?? 0) + xpFromContributions(contributions, salary, income))
 
   // Money we already sent to Pillar III shows up in the next Pillar III statement, so a
   // contribution only adds to the balances if it was invested after the newest one.

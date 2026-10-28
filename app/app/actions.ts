@@ -69,6 +69,7 @@ export async function simulateMonthEnd() {
     assets,
     jars,
     storedStartLevel: profile.start_level,
+    welcomeBonusXp: profile.welcome_bonus_xp,
   })
   const daysAdded = daysAtRetirement(jar.total_bani, salary, numbers.income)
   const gainedXp = daysAdded * XP_PER_DAY + (numbers.contributions.length > 0 ? STREAK_BONUS_XP : 0)

@@ -103,6 +103,7 @@ export async function getAppData(): Promise<AppDataResult> {
     assets,
     jars,
     storedStartLevel: profile.start_level,
+    welcomeBonusXp: profile.welcome_bonus_xp,
   })
 
   const toSummary = (jar: (typeof jars)[number]): JarSummary => ({

@@ -3,6 +3,7 @@
 // Onboarding (and Profile): read an uploaded PDF (pension or bank statement), then save
 // everything in one go at the end of onboarding.
 import { refresh } from 'next/cache'
+import { WELCOME_BONUS_XP } from '@/lib/rules/lifestyle'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { extractDocument } from '@/lib/ai'
@@ -128,6 +129,7 @@ export async function completeOnboarding(rawInput: OnboardingInput) {
         bank_card_last4: input.cardLinked ? (input.bank?.cardLast4 ?? null) : null,
         terms_accepted_at: new Date().toISOString(),
         last_seen_level: startLevel,
+        welcome_bonus_xp: WELCOME_BONUS_XP,
         onboarding_completed: true,
       })
       .eq('id', userId),

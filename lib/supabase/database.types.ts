@@ -283,6 +283,7 @@ export type Database = {
           stripe_payment_method_id: string | null
           terms_accepted_at: string | null
           updated_at: string
+          welcome_bonus_xp: number
           years_worked: number | null
         }
         Insert: {
@@ -308,6 +309,7 @@ export type Database = {
           stripe_payment_method_id?: string | null
           terms_accepted_at?: string | null
           updated_at?: string
+          welcome_bonus_xp?: number
           years_worked?: number | null
         }
         Update: {
@@ -333,6 +335,7 @@ export type Database = {
           stripe_payment_method_id?: string | null
           terms_accepted_at?: string | null
           updated_at?: string
+          welcome_bonus_xp?: number
           years_worked?: number | null
         }
         Relationships: []

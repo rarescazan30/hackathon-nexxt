@@ -56,6 +56,12 @@ export const MAX_LEVEL = TIER_COUNT * SLOTS.length; // 20
 export const XP_PER_DAY = 10;
 /** Extra XP for a contribution in the month right after another contribution. */
 export const STREAK_BONUS_XP = 20;
+/**
+ * XP a new account starts with. The first level-up costs FIRST_LEVEL_XP (300), so the first
+ * month the user says yes to (4+ days of freedom, ~100 RON for a 6,500 RON salary) already
+ * upgrades the island.
+ */
+export const WELCOME_BONUS_XP = 260;
 /** XP for the first level-up after onboarding; each next one costs 25% more (rounded to 50). */
 export const FIRST_LEVEL_XP = 300;
 export const LEVEL_XP_GROWTH = 1.25;

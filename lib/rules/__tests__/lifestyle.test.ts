@@ -195,3 +195,24 @@ test("days of freedom use the same state pension as the income projection", () =
   const flat = daysOfFreedomFromSalary(4200000, 650000).base;
   assert.ok(own < flat);
 });
+
+test("welcome bonus: a new account's first accepted month levels it up", async () => {
+  const { lifestyleNumbers } = await import("../../data/lifestyle-state");
+  const { WELCOME_BONUS_XP } = await import("../index");
+  const base = {
+    birthYear: 1992,
+    netSalaryBani: 650000,
+    yearsWorked: 12,
+    assets: [{ type: "pillar2", balance_bani: 4200000 }],
+    welcomeBonusXp: WELCOME_BONUS_XP,
+    year: 2026,
+  };
+  const before = lifestyleNumbers({ ...base, jars: [] });
+  assert.ok(before.level.xpForNext !== null && before.level.xpIntoLevel < before.level.xpForNext); // not yet
+  // A typical first month: round-ups + 3% of salary ≈ 225 RON.
+  const after = lifestyleNumbers({ ...base, jars: [{ month: "2026-10", status: "accepted", accepted_amount_bani: 22500 }] });
+  assert.strictEqual(after.level.level, before.level.level + 1);
+  // Even a small month (100 RON) is enough.
+  const small = lifestyleNumbers({ ...base, jars: [{ month: "2026-10", status: "accepted", accepted_amount_bani: 10000 }] });
+  assert.strictEqual(small.level.level, before.level.level + 1);
+});

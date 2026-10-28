@@ -2,7 +2,7 @@
 
 // Step 3, the hook: "If you retired today, this is how you'd live."
 import { RO_INFLATION_BY_YEAR } from '@/lib/rules/config'
-import { SLOTS, formatRatio, formatRon } from '@/lib/rules/lifestyle'
+import { SLOTS, WELCOME_BONUS_XP, formatRatio, formatRon } from '@/lib/rules/lifestyle'
 import type { LifestyleNumbers } from '@/lib/data/lifestyle-state'
 import { Card } from '@/components/app/shell'
 import { CountUpFreedom } from '@/components/app/count-up-freedom'
@@ -53,6 +53,9 @@ export function RevealStep({ numbers, onNext }: { numbers: LifestyleNumbers; onN
         </p>
       </Card>
 
+      <p className="flex items-center justify-center gap-1.5 rounded-xl bg-[#e3f5e9] px-3.5 py-2.5 text-center text-sm text-[#236243] dark:bg-[#1e3629] dark:text-[#bfe8d1]">
+        Welcome bonus: <b>+{WELCOME_BONUS_XP} XP</b>. Your first month unlocks the next upgrade.
+      </p>
       <button onClick={onNext} className={PRIMARY_BUTTON}>
         Let&rsquo;s make it better
       </button>
