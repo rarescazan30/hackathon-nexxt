@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { monthlyOfferMessage } from '@/lib/ai'
 import { getAppData } from '@/lib/data/app-data'
 import { lifestyleNumbers } from '@/lib/data/lifestyle-state'
-import { daysAddedFromAmount, levelState, roundUp, XP_PER_DAY, STREAK_BONUS_XP } from '@/lib/rules'
+import { daysAtRetirement, levelState, XP_PER_DAY, STREAK_BONUS_XP } from '@/lib/rules'
 import { monthRange, rebuildJar } from '@/lib/server/jar'
 import { importMockMonth } from '@/lib/server/mock-bank'
 import { answerOffer, collectJar, investJar, offerJar } from '@/lib/server/money-flow'
@@ -70,7 +70,7 @@ export async function simulateMonthEnd() {
     jars,
     storedStartLevel: profile.start_level,
   })
-  const daysAdded = daysAddedFromAmount(jar.total_bani, salary, numbers.income.stateReplacementRate).base
+  const daysAdded = daysAtRetirement(jar.total_bani, salary, numbers.income)
   const gainedXp = daysAdded * XP_PER_DAY + (numbers.contributions.length > 0 ? STREAK_BONUS_XP : 0)
   const after = levelState(numbers.startLevel, numbers.level.xp + gainedXp)
   const next = numbers.level.next
@@ -239,44 +239,4 @@ export async function connectCard() {
   await importMockMonth(db, userId, month, profile.net_salary_bani ?? 0, { untilDay: sameMonthAsToday ? now.getUTCDate() : 31, includeSalary: false })
   await rebuildOpenMonth(userId)
   refresh()
-}
-
-const PaymentInput = z.object({
-  counterparty: z.string().trim().min(1).max(40),
-  amountBani: z.number().int().positive().max(1_000_000), // up to 10,000 RON
-})
-
-/**
- * "Pay with card (demo)": a card payment arrives from the demo bank. It goes into the open
- * month and the round-up shows up right away. Returns the round-up for the animation.
- */
-export async function payWithCard(input: z.infer<typeof PaymentInput>): Promise<{ roundupBani: number }> {
-  const userId = await requireUserId()
-  const { counterparty, amountBani } = PaymentInput.parse(input)
-  const db = createAdminClient()
-
-  const latest = unwrap(await db.from('monthly_jars').select('month, status').eq('user_id', userId).order('month', { ascending: false }).limit(1))[0]
-  if (!latest || latest.status !== 'open') throw new Error('No open month to add a payment to')
-
-  // Today if the open month is the real current month; otherwise (a simulated month) its last day.
-  const today = new Date().toISOString().slice(0, 10)
-  const lastDay = new Date(`${monthRange(latest.month).end}T00:00:00Z`).getTime() - 86_400_000
-  const bookedAt = today.startsWith(latest.month) ? today : new Date(lastDay).toISOString().slice(0, 10)
-
-  unwrap(
-    await db.from('transactions').insert({
-      user_id: userId,
-      external_id: `demo-${crypto.randomUUID()}`,
-      booked_at: bookedAt,
-      amount_bani: -amountBani,
-      currency: 'RON',
-      counterparty,
-      description: 'Card payment (demo)',
-      is_card_payment: true,
-    }),
-  )
-  const profile = unwrap(await db.from('profiles').select('roundup_rule_bani, roundup_multiplier').eq('id', userId).single())
-  await rebuildJar(db, userId, latest.month)
-  refresh()
-  return { roundupBani: roundUp(amountBani, { stepBani: profile.roundup_rule_bani, multiplier: profile.roundup_multiplier }) }
 }

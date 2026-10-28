@@ -15,7 +15,7 @@ const SECTIONS = [
   },
   {
     title: 'How the money moves',
-    body: 'When you say yes, that amount is collected from your bank account on the 1st of the month by our licensed banking partner. It stays there for one month. On the 1st of the following month it is sent to your Pillar III fund, which buys fund units in your name.',
+    body: 'When you say yes, that amount is collected from your bank account or from the card you saved (processed by Stripe; we never see or store your card number). It stays with our licensed banking partner for one month. On the 1st of the following month it is sent to your Pillar III fund, which buys fund units in your name.',
   },
   {
     title: 'How we make money',

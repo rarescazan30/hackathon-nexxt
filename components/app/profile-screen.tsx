@@ -10,6 +10,7 @@ import type { AppData } from '@/lib/data/app-data'
 import { updateSettings } from '@/app/app/actions'
 import { AdminButton, Card, Header } from '@/components/app/shell'
 import { DetailsEditor } from '@/components/app/details-editor'
+import { PaymentSettings } from '@/components/app/payment-settings'
 import { SECONDARY_BUTTON } from '@/components/onboarding/onboarding-state'
 import { shortDate } from '@/components/app/types'
 
@@ -29,7 +30,7 @@ function Choice({ selected, disabled, onClick, children }: { selected: boolean; 
       onClick={onClick}
       disabled={disabled}
       aria-pressed={selected}
-      className={`pulse-hover rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors disabled:opacity-60 ${
+      className={`pulse-hover whitespace-nowrap rounded-xl px-2 py-2.5 text-xs font-semibold transition-colors disabled:opacity-60 ${
         selected ? 'bg-[#33256c] text-white' : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'
       }`}
     >
@@ -129,6 +130,8 @@ export function ProfileScreen({ data }: { data: AppData }) {
           Update your details
         </button>
       </Card>
+
+      <PaymentSettings settings={settings} />
 
       <Card className="flex flex-col gap-1 p-2">
         <Link href="/terms" className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium hover:bg-[#f1effa] dark:hover:bg-[#2b253a]">

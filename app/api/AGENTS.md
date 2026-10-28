@@ -25,6 +25,9 @@ stay thin: validate input, call `lib/*`, return the result.
 
 ## Routes
 
-None yet. Plan v2 uses **server actions** next to the pages instead
+- `POST /api/stripe/webhook`: marks a month's card payment `succeeded` / `failed`
+  (`monthly_jars.payment_status`); event ids in `stripe_events`. See `docs/STRIPE_TESTING.md`.
+
+Everything else uses **server actions** next to the pages
 (`app/app/actions.ts`, `app/onboarding/actions.ts`) and `app/auth/signout/route.ts`.
 Add a route here only for callers that aren't our own pages (Stripe webhook, cron).

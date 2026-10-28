@@ -1,12 +1,18 @@
 'use client'
 
 // Step 3, the hook: "If you retired today, this is how you'd live."
+import { RO_INFLATION_BY_YEAR } from '@/lib/rules/config'
 import { SLOTS, formatRatio, formatRon } from '@/lib/rules/lifestyle'
 import type { LifestyleNumbers } from '@/lib/data/lifestyle-state'
 import { Card } from '@/components/app/shell'
 import { CountUpFreedom } from '@/components/app/count-up-freedom'
 import { LifestyleScene, SLOT_NAMES, slotLabel } from '@/components/scene'
 import { PRIMARY_BUTTON } from './onboarding-state'
+
+// ~66: the total price rise over the years in the table (INS).
+const INFLATION_10Y_RISE_PERCENT = Math.round(
+  (Object.values(RO_INFLATION_BY_YEAR).reduce((factor, rate) => factor * (1 + rate), 1) - 1) * 100,
+)
 
 export function RevealStep({ numbers, onNext }: { numbers: LifestyleNumbers; onNext: () => void }) {
   const { level, income, totalDays } = numbers
@@ -34,13 +40,14 @@ export function RevealStep({ numbers, onNext }: { numbers: LifestyleNumbers; onN
           <b>{formatRatio(income.replacementRatio)}</b>
         </div>
         <div className="flex justify-between">
-          <span className="text-[#706b7b] dark:text-[#aaa4b6]">Days of freedom you already have</span>
+          <span className="text-[#706b7b] dark:text-[#aaa4b6]">Days of freedom your savings buy at 65</span>
           <b>
             <CountUpFreedom days={totalDays} />
           </b>
         </div>
         <p className="border-t border-dashed border-[#e2dfe8] pt-3 text-xs text-[#96909f] dark:border-[#353042]">
-          A cautious estimate in today&rsquo;s money: state pension + Pillar II + Pillar III. Education, not investment advice.
+          Prices in Romania rose {INFLATION_10Y_RISE_PERCENT}% in the last 10 years, so we only count growth above inflation. In
+          today&rsquo;s money: state pension + Pillar II + Pillar III. Education, not investment advice.
         </p>
       </Card>
 

@@ -22,7 +22,7 @@ export function HeroScene() {
   return (
     <div className="relative">
       <LifestyleScene slots={slotsAtLevel(level)} highlight={slotUnlockedAt(level)} />
-      <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#5f4bb6] shadow-sm dark:bg-[#211d2b]/90 dark:text-[#a594f0]">
+      <span className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#5f4bb6] shadow-sm dark:bg-[#211d2b]/90 dark:text-[#a594f0]">
         Level {level} · {TIER_NAMES[tier - 1]}
       </span>
     </div>

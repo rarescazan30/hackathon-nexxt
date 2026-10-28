@@ -8,14 +8,17 @@ import { Check, Clock3, FastForward, Sparkles } from 'lucide-react'
 import { formatFreedom, formatRon } from '@/lib/rules/lifestyle'
 import type { AppData, JarSummary } from '@/lib/data/app-data'
 import { answerMonthlyOffer, simulateMonthEnd } from '@/app/app/actions'
+import { completeCardPayment, payMonthWithCard } from '@/app/app/card-actions'
 import { Card, Header } from '@/components/app/shell'
-import { PayWithCard } from '@/components/app/pay-with-card'
 import { DemoBank } from '@/components/bank/demo-bank'
+import { getStripeJs } from '@/components/stripe/card-form'
 import { monthName, shortDate, type Tab } from '@/components/app/types'
 
 const MAX_OFFER_MULTIPLE = 2
 
-function OfferCard({ jar }: { jar: JarSummary }) {
+type SavedCard = AppData['settings']['card']
+
+function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
   const [pending, startTransition] = useTransition()
   const [editing, setEditing] = useState(false)
   const [amountRon, setAmountRon] = useState(String(Math.round(jar.totalBani / 100)))
@@ -24,8 +27,23 @@ function OfferCard({ jar }: { jar: JarSummary }) {
   const validAmount = amountBani > 0 && amountBani <= jar.totalBani * MAX_OFFER_MULTIPLE
 
   const [confirming, setConfirming] = useState(false)
+  const [payError, setPayError] = useState<string>()
   const answer = (accept: boolean) =>
     startTransition(() => answerMonthlyOffer({ jarId: jar.id, accept, amountBani: accept && editing ? amountBani : undefined }))
+
+  // With a saved card: charge it (Stripe, test mode). If the bank wants 3-D Secure,
+  // Stripe shows its own screen, then the server checks the payment went through.
+  const payByCard = () =>
+    startTransition(async () => {
+      setPayError(undefined)
+      let result = await payMonthWithCard({ jarId: jar.id, amountBani: editing ? amountBani : undefined })
+      if (result.status === 'requires_action') {
+        const stripe = await getStripeJs()
+        const confirmed = stripe ? await stripe.handleNextAction({ clientSecret: result.clientSecret }) : null
+        result = confirmed && !confirmed.error ? await completeCardPayment(result.paymentIntentId) : { status: 'failed', message: confirmed?.error?.message ?? 'The bank did not confirm the payment.' }
+      }
+      if (result.status === 'failed') setPayError(result.message)
+    })
 
   return (
     <Card className="border-[#ddd4fa] !bg-[#faf8ff] dark:!bg-[#241e33]">
@@ -68,15 +86,21 @@ function OfferCard({ jar }: { jar: JarSummary }) {
           <p className="mt-1 text-[28px] font-semibold tracking-[-.03em]">{formatRon(jar.totalBani, { wholeRon: true })}</p>
         )}
         <p className="mt-1 text-xs font-semibold text-[#438565] dark:text-[#6bc495]">+{formatFreedom(jar.daysAdded)} of freedom</p>
+        {card && (
+          <p className="mt-2 text-xs text-[#858090] dark:text-[#a39cab]">
+            Paid with your card {card.brand.charAt(0).toUpperCase() + card.brand.slice(1)} •• {card.last4} (test mode)
+          </p>
+        )}
       </div>
+      {payError && <p className="mt-3 rounded-xl bg-[#fdecec] px-3.5 py-2.5 text-sm text-[#b42318] dark:bg-[#3a1f24] dark:text-[#f3a4a4]">{payError}</p>}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button
-          onClick={() => setConfirming(true)}
+          onClick={() => (card ? payByCard() : setConfirming(true))}
           disabled={pending || !validAmount}
           className="pulse-hover rounded-xl bg-[#33256c] px-3 py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
-          {pending ? 'One moment…' : 'Yes, add it'}
+          {pending ? (card ? 'Paying…' : 'One moment…') : 'Yes, add it'}
         </button>
         <button
           onClick={() => setEditing((value) => !value)}
@@ -136,8 +160,8 @@ function ChangeLink({ onClick }: { onClick: () => void }) {
   )
 }
 
-function CurrentMonth({ jar, openSettings }: { jar: JarSummary; openSettings: () => void }) {
-  if (jar.status === 'offered') return <OfferCard jar={jar} />
+function CurrentMonth({ jar, card, openSettings }: { jar: JarSummary; card: SavedCard; openSettings: () => void }) {
+  if (jar.status === 'offered') return <OfferCard jar={jar} card={card} />
 
   const answered = jar.status !== 'open'
   const line = statusLine(jar)
@@ -178,8 +202,7 @@ export function MonthScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab
     <div className="flex flex-col gap-4">
       <Header title="This month" subtitle="Your piggy bank" />
 
-      {currentJar ? <CurrentMonth jar={currentJar} openSettings={() => setTab('profile')} /> : <Card>No activity yet.</Card>}
-      {currentJar?.status === 'open' && <PayWithCard cardLinked={data.settings.cardLinked} />}
+      {currentJar ? <CurrentMonth jar={currentJar} card={data.settings.card} openSettings={() => setTab('profile')} /> : <Card>No activity yet.</Card>}
       <SimulateButton />
 
       {roundups.length > 0 && currentJar?.status === 'open' && (

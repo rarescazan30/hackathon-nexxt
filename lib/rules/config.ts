@@ -43,6 +43,46 @@ export const TARGET_RETIREMENT_REPLACEMENT_RATE = 0.65;
 export const BASELINE_INFLATION_RATE = 0.035;
 
 /**
+ * Romania's average yearly inflation (CPI, "rata medie anuală") for the last 10 years.
+ * Source: Institutul Național de Statistică (INS), yearly CPI releases (insse.ro);
+ * 2025 from BNR / bank reports citing INS, to re-check on insse.ro.
+ */
+export const RO_INFLATION_BY_YEAR: Record<number, number> = {
+  2016: -0.015,
+  2017: 0.013,
+  2018: 0.046,
+  2019: 0.038,
+  2020: 0.026,
+  2021: 0.051,
+  2022: 0.138,
+  2023: 0.104,
+  2024: 0.056,
+  2025: 0.073,
+};
+
+/**
+ * The yearly rate that gives the same total price rise as the last 10 years (geometric
+ * mean): prices × ~1.66 over 2016–2025 → ~5.2% a year.
+ */
+export const INFLATION_10Y_AVERAGE = (() => {
+  const rates = Object.values(RO_INFLATION_BY_YEAR);
+  const totalRise = rates.reduce((factor, rate) => factor * (1 + rate), 1);
+  return Math.pow(totalRise, 1 / rates.length) - 1;
+})();
+
+/**
+ * Long-run nominal return of Romanian private pension funds (~7.5% a year).
+ * Source: ASF yearly statistics on Pillar II funds, 2008–2024 (asfromania.ro).
+ */
+export const PENSION_FUND_NOMINAL_RETURN = 0.075;
+
+/**
+ * What pension savings really grow by once 10 years of real inflation are taken out:
+ * (1 + 7.5%) ÷ (1 + 5.2%) − 1 ≈ 2.2% a year. Used for days of freedom and the lifestyle.
+ */
+export const REAL_RETURN_AFTER_INFLATION = (1 + PENSION_FUND_NOMINAL_RETURN) / (1 + INFLATION_10Y_AVERAGE) - 1;
+
+/**
  * Real annual return rates (above inflation) across 3 standard scenarios.
  *
  * Pessimistic (1.5% real):

@@ -3,12 +3,12 @@
 // Deterministic, integer bani for money, no external dependencies.
 
 import {
+  REAL_RETURN_AFTER_INFLATION,
   RETIREMENT_HORIZON_YEARS,
-  REAL_RETURN_RATES,
   STANDARD_RETIREMENT_AGE,
   STATE_PENSION_REPLACEMENT_RATE,
 } from "./config";
-import { daysAddedFromAmount } from "./freedom";
+import { daysOfFreedomFromSalary } from "./freedom";
 import { project } from "./projection";
 
 /**
@@ -31,10 +31,10 @@ export const PILLAR_TWO_CONTRIBUTION_RATE = 0.0475;
 export const NET_TO_GROSS_RATIO = 0.585;
 
 /**
- * The lifestyle snapshot uses the pessimistic real return on purpose: the reveal says
- * "this is how you'd live", so it must not flatter the user.
+ * Real growth of pension savings: the funds' long-run return minus the last 10 years of
+ * Romanian inflation (~2.2% a year, see config.ts). Used for income and days of freedom.
  */
-export const LIFESTYLE_RETURN_RATE = REAL_RETURN_RATES.pessimistic;
+export const LIFESTYLE_RETURN_RATE = REAL_RETURN_AFTER_INFLATION;
 
 /**
  * Replacement ratio (retirement income ÷ today's net salary) at which each tier starts.
@@ -49,8 +49,11 @@ export const SLOTS = ["home", "transport", "food", "extras"] as const;
 export type Slot = (typeof SLOTS)[number];
 export const MAX_LEVEL = TIER_COUNT * SLOTS.length; // 20
 
-/** XP for each day of freedom added through the app. */
-export const XP_PER_DAY = 20;
+/**
+ * XP for each day of freedom added through the app. Days now include growth until 65
+ * (about ×2 for a 34-year-old), so a day is worth 10 XP to keep the same pace of levels.
+ */
+export const XP_PER_DAY = 10;
 /** Extra XP for a contribution in the month right after another contribution. */
 export const STREAK_BONUS_XP = 20;
 /** XP for the first level-up after onboarding; each next one costs 25% more (rounded to 50). */
@@ -79,6 +82,11 @@ export interface RetirementIncome {
    * numbers on screen tell one story.
    */
   stateReplacementRate: number;
+  /**
+   * What 1 RON saved today is worth at retirement, in today's money (real growth after
+   * inflation), e.g. 1.96 for 31 years at 2.2%. Days of freedom use it too.
+   */
+  growthToRetirement: number;
 }
 
 /**
@@ -115,6 +123,7 @@ export function projectedRetirementIncome(input: RetirementIncomeInput): Retirem
     totalMonthlyBani,
     replacementRatio: salary > 0 ? totalMonthlyBani / salary : 0,
     stateReplacementRate,
+    growthToRetirement: Math.pow(1 + LIFESTYLE_RETURN_RATE, yearsLeft),
   };
 }
 
@@ -151,16 +160,29 @@ function previousMonth(month: string): string {
  * XP earned through the app: XP_PER_DAY for each day of freedom a contribution adds,
  * plus STREAK_BONUS_XP when the previous month also had a contribution.
  */
+/**
+ * Days of retirement that `amountBani` saved today pays for: it grows until 65 (real,
+ * after inflation), then covers the daily gap between the state pension and 65% of salary.
+ */
+export function daysAtRetirement(
+  amountBani: number,
+  netSalaryBani: number,
+  income: Pick<RetirementIncome, "stateReplacementRate" | "growthToRetirement">
+): number {
+  const grownBani = Math.round(Math.max(0, amountBani) * income.growthToRetirement);
+  return daysOfFreedomFromSalary(grownBani, netSalaryBani, income.stateReplacementRate).base;
+}
+
 export function xpFromContributions(
   contributions: Contribution[],
   netSalaryBani: number,
-  stateReplacementRate?: number
+  income: Pick<RetirementIncome, "stateReplacementRate" | "growthToRetirement">
 ): number {
   const months = new Set(contributions.filter((c) => c.amountBani > 0).map((c) => c.month));
   let xp = 0;
   for (const contribution of contributions) {
     if (contribution.amountBani <= 0) continue;
-    xp += daysAddedFromAmount(contribution.amountBani, netSalaryBani, stateReplacementRate).base * XP_PER_DAY;
+    xp += daysAtRetirement(contribution.amountBani, netSalaryBani, income) * XP_PER_DAY;
     if (months.has(previousMonth(contribution.month))) xp += STREAK_BONUS_XP;
   }
   return xp;

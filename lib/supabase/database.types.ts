@@ -50,6 +50,7 @@ export type Database = {
           invested_at: string | null
           month: string
           offer_message: string | null
+          payment_status: string | null
           roundups_bani: number
           salary_bani: number
           status: Database["public"]["Enums"]["jar_status"]
@@ -67,6 +68,7 @@ export type Database = {
           invested_at?: string | null
           month: string
           offer_message?: string | null
+          payment_status?: string | null
           roundups_bani?: number
           salary_bani?: number
           status?: Database["public"]["Enums"]["jar_status"]
@@ -84,6 +86,7 @@ export type Database = {
           invested_at?: string | null
           month?: string
           offer_message?: string | null
+          payment_status?: string | null
           roundups_bani?: number
           salary_bani?: number
           status?: Database["public"]["Enums"]["jar_status"]
@@ -259,6 +262,8 @@ export type Database = {
       profiles: {
         Row: {
           birth_year: number | null
+          card_brand: string | null
+          card_last4: string | null
           card_linked: boolean
           created_at: string
           full_name: string | null
@@ -272,12 +277,16 @@ export type Database = {
           roundup_rule_bani: number
           salary_percent_bp: number
           start_level: number | null
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
           terms_accepted_at: string | null
           updated_at: string
           years_worked: number | null
         }
         Insert: {
           birth_year?: number | null
+          card_brand?: string | null
+          card_last4?: string | null
           card_linked?: boolean
           created_at?: string
           full_name?: string | null
@@ -291,12 +300,16 @@ export type Database = {
           roundup_rule_bani?: number
           salary_percent_bp?: number
           start_level?: number | null
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           terms_accepted_at?: string | null
           updated_at?: string
           years_worked?: number | null
         }
         Update: {
           birth_year?: number | null
+          card_brand?: string | null
+          card_last4?: string | null
           card_linked?: boolean
           created_at?: string
           full_name?: string | null
@@ -310,6 +323,8 @@ export type Database = {
           roundup_rule_bani?: number
           salary_percent_bp?: number
           start_level?: number | null
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
           terms_accepted_at?: string | null
           updated_at?: string
           years_worked?: number | null
@@ -436,6 +451,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stripe_events: {
+        Row: {
+          id: string
+          received_at: string
+          type: string
+        }
+        Insert: {
+          id: string
+          received_at?: string
+          type: string
+        }
+        Update: {
+          id?: string
+          received_at?: string
+          type?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {

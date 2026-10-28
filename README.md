@@ -31,9 +31,10 @@ Before a PR: `npm run lint`, `npm test` and `npm run build` must pass.
 | `/` | landing page: the question, one line, the island; details behind "Find out more" |
 | `/login`, `/register` | auth (no demo shortcut: the demo shows the real flow) |
 | `/onboarding` | statement upload → 3 questions → retirement reveal → round-ups + demo bank |
-| `/app` | Home (days count-up, 3D island you can spin, level, share), Month (pay with card, offer), Profile (edit your details) |
+| `/app` | Home (days count-up, 3D island you can spin, level, share), Month (offer, paid by card or demo bank), Profile (details, card and bank) |
 | `/i/<code>` | public "Share my island" card: first name, level, island, sign-up button |
 | `/admin` | company numbers (users, money held, interest, projection); admin account only |
+| `/api/stripe/webhook` | Stripe test-mode payment results (see `docs/STRIPE_TESTING.md`) |
 | `/terms` | plain-English terms, including the one-month hold and interest |
 | `/dev/scene` | 3D scene playground (dev only) |
 

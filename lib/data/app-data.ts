@@ -1,8 +1,9 @@
 // Loads everything the /app screens show, for the logged-in user (RLS does the filtering).
 // The screens get this object as props; they never fetch on their own.
 import { redirect } from 'next/navigation'
-import { daysAddedFromAmount, slotUnlockedAt, type LevelState, type RetirementIncome, type Slot } from '@/lib/rules'
+import { daysAtRetirement, slotUnlockedAt, type LevelState, type RetirementIncome, type Slot } from '@/lib/rules'
 import { isAdminEmail } from '@/lib/server/admin'
+import { stripeIsConfigured } from '@/lib/server/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { lifestyleNumbers } from './lifestyle-state'
 
@@ -31,6 +32,10 @@ export interface AppData {
     roundupRuleBani: number
     salaryPercentBp: number
     cardLinked: boolean
+    /** The saved payment card (Stripe), e.g. { brand: 'visa', last4: '4242' }. */
+    card: { brand: string; last4: string } | null
+    /** Stripe test keys are set, so cards can be added and charged. */
+    cardPaymentsReady: boolean
   }
   freedom: { totalDays: number; daysFromApp: number }
   retirement: RetirementIncome
@@ -88,7 +93,7 @@ export async function getAppData(): Promise<AppDataResult> {
     offerMessage: jar.offer_message,
     investOn: jar.invest_on,
     interestBani: jar.float_interest_bani,
-    daysAdded: daysAddedFromAmount(jar.accepted_amount_bani ?? jar.total_bani, salary, numbers.income.stateReplacementRate).base,
+    daysAdded: daysAtRetirement(jar.accepted_amount_bani ?? jar.total_bani, salary, numbers.income),
   })
   const [current, ...past] = jars
 
@@ -122,6 +127,8 @@ export async function getAppData(): Promise<AppDataResult> {
         roundupRuleBani: profile.roundup_rule_bani,
         salaryPercentBp: profile.salary_percent_bp,
         cardLinked: profile.card_linked,
+        card: profile.card_last4 ? { brand: profile.card_brand ?? 'card', last4: profile.card_last4 } : null,
+        cardPaymentsReady: stripeIsConfigured(),
       },
       freedom: { totalDays: numbers.totalDays, daysFromApp: numbers.daysFromApp },
       retirement: numbers.income,

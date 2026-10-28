@@ -19,6 +19,9 @@ import {
   floatInterestBani,
   profileError,
   daysOfFreedomFromSalary,
+  daysAtRetirement,
+  INFLATION_10Y_AVERAGE,
+  REAL_RETURN_AFTER_INFLATION,
 } from "../index";
 
 const andrei = JSON.parse(
@@ -68,10 +71,11 @@ test("xpForLevelUp: early level-ups are cheap, later ones grow", () => {
   assert.deepStrictEqual([1, 2, 3, 4, 5].map(xpForLevelUp), [300, 400, 450, 600, 750]);
 });
 
-test("xpFromContributions: days × 20 plus a streak bonus for consecutive months", () => {
-  // 225 RON adds 6 days for Andrei's salary → 120 XP each.
-  const single = xpFromContributions([{ month: "2026-05", amountBani: 22500 }], andrei.salaryBani);
-  assert.strictEqual(single, 120);
+test("xpFromContributions: days × 10 plus a streak bonus for consecutive months", () => {
+  // Without growth (as if at 65): 225 RON adds 6 days for Andrei's salary → 60 XP each.
+  const atRetirement = { stateReplacementRate: 0.48, growthToRetirement: 1 };
+  const single = xpFromContributions([{ month: "2026-05", amountBani: 22500 }], andrei.salaryBani, atRetirement);
+  assert.strictEqual(single, 60);
 
   const streak = xpFromContributions(
     [
@@ -79,9 +83,10 @@ test("xpFromContributions: days × 20 plus a streak bonus for consecutive months
       { month: "2026-06", amountBani: 22500 },
       { month: "2026-08", amountBani: 22500 }, // July skipped: no bonus for August
     ],
-    andrei.salaryBani
+    andrei.salaryBani,
+    atRetirement
   );
-  assert.strictEqual(streak, 120 * 3 + 20);
+  assert.strictEqual(streak, 60 * 3 + 20);
 
   // Year boundary counts as consecutive.
   const newYear = xpFromContributions(
@@ -89,9 +94,27 @@ test("xpFromContributions: days × 20 plus a streak bonus for consecutive months
       { month: "2026-12", amountBani: 22500 },
       { month: "2027-01", amountBani: 22500 },
     ],
-    andrei.salaryBani
+    andrei.salaryBani,
+    atRetirement
   );
-  assert.strictEqual(newYear, 120 * 2 + 20);
+  assert.strictEqual(newYear, 60 * 2 + 20);
+});
+
+test("inflation: 10 years of Romanian CPI → ~5.2% a year, ~2.2% real growth", () => {
+  assert.ok(Math.abs(INFLATION_10Y_AVERAGE - 0.052) < 0.001);
+  assert.ok(Math.abs(REAL_RETURN_AFTER_INFLATION - 0.022) < 0.001);
+});
+
+test("daysAtRetirement: savings grow until 65 (after inflation), then pay for days", () => {
+  const income = projectedRetirementIncome({ age: 34, netSalaryBani: 650000, yearsWorked: 12, pillarTwoBani: 0, pillarThreeBani: 0 });
+  // 31 years at ~2.2% real ≈ ×1.96
+  assert.ok(income.growthToRetirement > 1.9 && income.growthToRetirement < 2.0);
+  const today = daysOfFreedomFromSalary(4200000, 650000).base; // 1156 days in today's money, no growth
+  const at65 = daysAtRetirement(4200000, 650000, income);
+  assert.ok(at65 > today * 1.9 && at65 < today * 2.0);
+  // At 64 there is almost no time left to grow.
+  const late = projectedRetirementIncome({ age: 64, netSalaryBani: 650000, yearsWorked: 40, pillarTwoBani: 0, pillarThreeBani: 0 });
+  assert.ok(late.growthToRetirement < 1.03);
 });
 
 test("slotsAtLevel: one slot upgrades per level, home first", () => {

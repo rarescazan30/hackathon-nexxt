@@ -24,25 +24,23 @@ export function HomeScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab)
         <p className="mt-2 text-[34px] font-semibold leading-tight tracking-[-.04em]">
           <CountUpFreedom days={freedom.totalDays} />
         </p>
-        <p className="mt-1 text-sm text-[#d9d2f5]">of retirement your private savings already pay for</p>
+        <p className="mt-1 text-sm text-[#d9d2f5]">of retirement your savings will pay for at 65, in today&rsquo;s money</p>
         {freedom.daysFromApp > 0 && (
           <span className="mt-4 inline-flex rounded-full bg-[#bfe8d1] px-3 py-1 text-xs font-semibold text-[#236243]">
-            +{formatFreedom(freedom.daysFromApp)} with zile.
+            +{formatFreedom(freedom.daysFromApp)} since using our app
           </span>
         )}
       </Card>
 
       <Card className="overflow-hidden p-0">
-        <div className="flex items-center justify-between px-5 pt-5">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">If you retired today</p>
-            <p className="mt-1 text-sm text-[#706b7b] dark:text-[#aaa4b6]">
-              about <b className="text-[#292431] dark:text-white">{formatRatio(retirement.replacementRatio)}</b> of the life you have now
-            </p>
-          </div>
-          <span className="rounded-full bg-[#f1effa] px-3 py-1 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
+        <div className="px-5 pt-5">
+          <span className="inline-flex whitespace-nowrap rounded-full bg-[#f1effa] px-3 py-1 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
             Level {level.level}
           </span>
+          <p className="mt-3 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">If you retired today</p>
+          <p className="mt-1 text-sm text-[#706b7b] dark:text-[#aaa4b6]">
+            about <b className="text-[#292431] dark:text-white">{formatRatio(retirement.replacementRatio)}</b> of the life you have now
+          </p>
         </div>
         <div data-share-scene>
           <LifestyleScene slots={level.slots} snapshot />

@@ -1,4 +1,4 @@
-// Landing page: the question, one line and the island. Everything else waits behind
+// Landing page: the question, one line, Sign up / Log in and the island. Everything else waits behind
 // "Find out more", so the first contact stays clean.
 import Link from 'next/link'
 import { CreditCard, Landmark, ShieldCheck, Sparkles } from 'lucide-react'
@@ -18,16 +18,8 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-[#f7f6f9] text-[#292431] dark:bg-[#18151f] dark:text-[#f8f6fb]">
       <div className="mx-auto w-full max-w-[960px] px-5 pb-16 pt-6">
-        <nav className="flex items-start justify-between">
+        <nav>
           <Logo />
-          <div className="flex flex-col items-center gap-1.5">
-            <Link href="/register" className="pulse-hover rounded-full bg-[#33256c] px-5 py-2 text-sm font-semibold text-white">
-              Sign up
-            </Link>
-            <Link href="/login" className="text-sm font-semibold text-[#5f4bb6] dark:text-[#a594f0]">
-              Log in
-            </Link>
-          </div>
         </nav>
 
         {/* Hero */}
@@ -40,6 +32,14 @@ export default function LandingPage() {
               Upload your pension statement, answer 3 questions, and see your retirement in a minute. Then grow it with your
               card&rsquo;s round-ups.
             </p>
+            <div className="flex max-w-[360px] flex-col gap-3">
+              <Link href="/register" className="pulse-hover w-full rounded-xl bg-[#33256c] py-3 text-center text-sm font-semibold text-white dark:bg-[#6f5cc1]">
+                Sign up
+              </Link>
+              <Link href="/login" className="pulse-hover w-full rounded-xl bg-white py-3 text-center text-sm font-semibold text-[#33256c] dark:bg-[#211d2b] dark:text-white">
+                Log in
+              </Link>
+            </div>
           </div>
           <Card className="overflow-hidden p-0">
             <HeroScene />

@@ -48,14 +48,15 @@ function PensionCard({ pension, onChange, onRemove }: { pension: PensionDraft; o
         <label className={LABEL_CLASS} htmlFor={`${pension.key}-provider`}>Fund</label>
         <input id={`${pension.key}-provider`} className={INPUT_CLASS} value={pension.provider} placeholder="e.g. NN Pensii" onChange={(e) => onChange({ ...pension, provider: e.target.value })} />
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <div>
+      {/* One row per field on phones: the browser's date picker is wider than half a card. */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="min-w-0">
           <label className={LABEL_CLASS} htmlFor={`${pension.key}-balance`}>Balance (RON)</label>
           <input id={`${pension.key}-balance`} className={INPUT_CLASS} inputMode="decimal" value={pension.balanceRon} onChange={(e) => onChange({ ...pension, balanceRon: e.target.value })} />
         </div>
-        <div>
+        <div className="min-w-0">
           <label className={LABEL_CLASS} htmlFor={`${pension.key}-date`}>On date</label>
-          <input id={`${pension.key}-date`} type="date" className={INPUT_CLASS} value={pension.asOf} onChange={(e) => onChange({ ...pension, asOf: e.target.value })} />
+          <input id={`${pension.key}-date`} type="date" className={`${INPUT_CLASS} min-w-0 appearance-none`} value={pension.asOf} onChange={(e) => onChange({ ...pension, asOf: e.target.value })} />
         </div>
       </div>
     </Card>

@@ -26,7 +26,7 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
     <button
       onClick={onClick}
       aria-pressed={selected}
-      className={`pulse-hover rounded-xl py-2.5 text-xs font-semibold ${selected ? 'bg-[#33256c] text-white' : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'}`}
+      className={`pulse-hover whitespace-nowrap rounded-xl py-2.5 text-xs font-semibold ${selected ? 'bg-[#33256c] text-white' : 'bg-[#f1effa] text-[#706b7b] dark:bg-[#2b253a] dark:text-[#aaa4b6]'}`}
     >
       {children}
     </button>

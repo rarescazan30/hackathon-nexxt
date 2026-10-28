@@ -7,14 +7,13 @@ import { Psd2Transaction } from '../lib/contracts'
 import {
   firstLevelOfTier,
   formatRon,
-  levelState,
   parseDecimalStringToBani,
   projectedRetirementIncome,
   tierFromRatio,
-  xpFromContributions,
 } from '../lib/rules'
 import { rebuildJar } from '../lib/server/jar'
 import { answerOffer, collectJar, investJar, offerJar, oneMonthLater } from '../lib/server/money-flow'
+import { lifestyleNumbers } from '../lib/data/lifestyle-state'
 import { mockIdPrefix } from '../lib/server/mock-bank'
 import { unwrap } from '../lib/server/unwrap'
 import { createAdminClient } from '../lib/supabase/admin'
@@ -154,23 +153,20 @@ async function markLevelSeen(userId: string) {
   const jars = unwrap(
     await db
       .from('monthly_jars')
-      .select('month, accepted_amount_bani, status, float_interest_bani')
+      .select('month, accepted_amount_bani, status, float_interest_bani, invested_at')
       .eq('user_id', userId)
       .order('month'),
   )
-  const income = projectedRetirementIncome({
-    age: persona.age,
+  // The same numbers the app computes (lib/data/lifestyle-state.ts).
+  const assets = unwrap(await db.from('pension_assets').select('type, balance_bani, as_of').eq('user_id', userId))
+  const numbers = lifestyleNumbers({
+    birthYear: Number(CURRENT_MONTH.slice(0, 4)) - persona.age,
     netSalaryBani: persona.salaryBani,
     yearsWorked: persona.yearsWorked,
-    pillarTwoBani: persona.pillarTwoBani,
-    pillarThreeBani: 0,
+    assets,
+    jars,
   })
-  const startLevel = firstLevelOfTier(tierFromRatio(income.replacementRatio))
-  const contributions = jars
-    .filter((jar) => ['accepted', 'collected', 'invested'].includes(jar.status))
-    .map((jar) => ({ month: jar.month, amountBani: jar.accepted_amount_bani ?? 0 }))
-  const state = levelState(startLevel, xpFromContributions(contributions, persona.salaryBani))
-
+  const { income, startLevel, level: state } = numbers
   unwrap(await db.from('profiles').update({ last_seen_level: state.level, start_level: startLevel }).eq('id', userId))
   return { jars, income, startLevel, state }
 }

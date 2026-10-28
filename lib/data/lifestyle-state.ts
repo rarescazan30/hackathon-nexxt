@@ -2,8 +2,7 @@
 // XP and level. Pure (no DB calls), so the loader, the server actions and the seed agree.
 // Relative imports so scripts can use it with jiti.
 import {
-  daysAddedFromAmount,
-  daysOfFreedomFromSalary,
+  daysAtRetirement,
   firstLevelOfTier,
   levelState,
   projectedRetirementIncome,
@@ -36,7 +35,10 @@ export interface LifestyleNumbers {
   contributions: Contribution[]
   contributedBani: number
   level: LevelState
-  /** Days of retirement covered by all private savings (statements + contributions not in them yet). */
+  /**
+   * Days of retirement all private savings (statements + contributions not in them yet)
+   * will pay for at 65, in today's money.
+   */
   totalDays: number
   /** The part of totalDays added through the app. */
   daysFromApp: number
@@ -65,8 +67,7 @@ export function lifestyleNumbers(input: LifestyleInput): LifestyleNumbers {
     .filter((jar) => (CONTRIBUTED_STATUSES as readonly string[]).includes(jar.status))
     .map((jar) => ({ month: jar.month, amountBani: jar.accepted_amount_bani ?? 0 }))
   const contributedBani = contributions.reduce((sum, c) => sum + c.amountBani, 0)
-  const stateRate = income.stateReplacementRate
-  const level = levelState(startLevel, xpFromContributions(contributions, salary, stateRate))
+  const level = levelState(startLevel, xpFromContributions(contributions, salary, income))
 
   // Money we already sent to Pillar III shows up in the next Pillar III statement, so a
   // contribution only adds to the balances if it was invested after the newest one.
@@ -86,7 +87,7 @@ export function lifestyleNumbers(input: LifestyleInput): LifestyleNumbers {
     contributions,
     contributedBani,
     level,
-    totalDays: daysOfFreedomFromSalary(assetsBani + notInStatementBani, salary, stateRate).base,
-    daysFromApp: daysAddedFromAmount(contributedBani, salary, stateRate).base,
+    totalDays: daysAtRetirement(assetsBani + notInStatementBani, salary, income),
+    daysFromApp: daysAtRetirement(contributedBani, salary, income),
   }
 }
