@@ -1,7 +1,7 @@
 # Plan v2: "How will you live in retirement?"
 
 Status: **agreed direction, open details in section 12.** Replaces `docs/plan-task4.md`.
-**Built so far:** phases A1, A2, A3 (branch `new_app`). Next: A4 (Sebi), B1, B2.
+**Built:** all phases A1–D2 on branch `new_app`. Demo: `npm run seed`, then "Log in as Andrei (demo)".
 Owner of the plan: Rareș. Every section says what is reused from the current code.
 
 ---

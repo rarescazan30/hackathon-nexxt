@@ -24,10 +24,10 @@ bank-statement extraction, explanations of numbers.
 - Only mock data goes into prompts (free tiers may use prompts for training).
 - Cache answers for the demo persona so the live demo doesn't depend on rate limits.
 
-## Planned pieces (draft)
+## Files
 
-- `model.ts`: provider selection
-- `prompt.ts`: system prompt and guardrails
-- `tools.ts`: `calculate_projection`, `search_knowledge`, `get_transactions`, `analyze_document`
-- `categorize.ts`: transaction categories and which ones change in retirement
-- `extract.ts`: bank statement (PDF/CSV) → transactions
+- `model.ts`: provider switch (`AI_PROVIDER`: gemini | groq | mock) and `callModel()`.
+- `monthly-message.ts`: the month-end offer sentence; numbers are passed in, never invented.
+- `extract-statement.ts`: reads a Pillar II/III statement PDF (Gemini) → `StatementExtract`;
+  on mock it returns clearly labelled sample values.
+- Tests: `__tests__/ai.test.ts` (run with `npm test`, mock provider).

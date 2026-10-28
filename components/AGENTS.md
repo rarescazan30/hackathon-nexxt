@@ -4,25 +4,20 @@ Owner: **Frontend Lead**. Read the root `AGENTS.md` and `app/AGENTS.md` first.
 
 ## Layout
 
-- `components/app/`: the app's own screens and shell (from the v0 prototype). One file
-  per tab, so different people can work on different tabs without conflicts.
-- `components/ui/`: shadcn/ui primitives (style `base-nova`, built on Base UI, config in
-  `components.json`). Add new ones with `npx shadcn add <name>`; don't hand-edit them
-  unless needed.
+- `components/app/`: the 3 app screens (`home-screen`, `month-screen`, `profile-screen`),
+  `app-shell` (tabs), `level-up-overlay`, and `shell.tsx` (Logo, Card, Header, BottomNav).
+- `components/scene/`: the low-poly three.js scene. Import `LifestyleScene` from
+  `components/scene` (client-only, lazy). Models are built from primitives in `parts.tsx`;
+  one file per slot in `slots/`. Try changes on `/dev/scene`.
+- `components/onboarding/`, `components/landing/`, `components/auth/`: one file per step/section.
+- `components/ui/`: shadcn/ui primitives (`npx shadcn add <name>`).
 
 ## Rules
 
-- Components receive data as **props typed from `lib/contracts.ts`**. No fetching and no
-  hard-coded data inside components.
-- Use shadcn/ui primitives and Tailwind; keep one visual style across the app.
-- Components generated with v0 or other tools get cleaned up before merging: real
-  props, no fake inline data, no unused code.
+- Screens receive data as props (`AppData` from `lib/data/app-data.ts`). No fetching and
+  no hard-coded data inside components.
+- Same look everywhere: background `#f7f6f9` / `#18151f`, `Card` (rounded 24px), deep purple
+  `#33256c` buttons, lavender `#8c7ad9` uppercase eyebrows, mint for growth. Use the same
+  hex classes as the existing screens.
+- All text in English; money with `formatRon()`, days with `formatFreedom()`.
 - Accessible by default: real buttons and labels, sufficient contrast, readable font sizes.
-
-## Planned components (draft)
-
-- `DaysOfFreedom`: the big number, shown as a range, tappable for its explanation
-- `JarCard`: round-ups collected this month and the next collection date
-- `AllocationBar`: how a collection is split by risk level
-- `SourceChip`: a small link to the source behind a number or claim
-- `ChatResultCard`: renders a tool result inside the chat

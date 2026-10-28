@@ -49,3 +49,13 @@ export const Chunk = z.object({
   year: z.number().int().optional(),
 });
 export type Chunk = z.infer<typeof Chunk>;
+
+// What the AI reads from an uploaded pension statement (lib/ai/extract-statement.ts).
+// Money is converted to bani by our code, never by the model.
+export const StatementExtract = z.object({
+  kind: z.enum(["pillar2", "pillar3"]),
+  provider: z.string(),
+  balanceBani: Bani.nonnegative(),
+  asOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+export type StatementExtract = z.infer<typeof StatementExtract>;

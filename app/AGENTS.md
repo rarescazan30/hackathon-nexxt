@@ -12,42 +12,24 @@ Pages and layouts of the mobile-first app. Backend code lives in `app/api/` (sep
   screen inside a banking app.
 - The home screen shows **days of freedom** and **the jar**, not spending categories.
   We are not a budgeting app.
-- No jargon in the UI: "zile de libertate", not "randament" or "portofoliu".
+- No jargon in the UI: "days of freedom", not "returns" or "portfolio".
 - Every number on screen can be tapped to show where it comes from (source + assumption).
-- Data comes from `app/api/*` routes and is typed with schemas from `lib/contracts.ts`.
-  Never invent your own data shapes; while the backend isn't ready, import mock data
-  from `data/mock/` that matches the contract.
+- Data comes from `lib/data/app-data.ts` (`AppData`) and server actions. Screens never
+  fetch on their own and never hard-code data.
 - Reusable pieces go in `components/`; pages stay thin.
 - **All app text in English** (UI, errors, AI messages). Money as `169 RON`, `en` number format.
 
-## Current state: the v0 prototype
+## Pages (plan v2, `docs/plan.md`)
 
-`app/page.tsx` is a client component holding the active tab in state; the bottom nav
-switches between four screens in `components/app/`:
-
-| Tab | File | What it shows |
+| Route | File | What it shows |
 |---|---|---|
-| Acasă | `home-screen.tsx` | days of freedom hero (+ "De unde vine cifra asta?" sheet), monthly jar, recent activity, agent suggestion |
-| Agent | `agent-screen.tsx` | agent message, monthly proposal card (Pilonul 3 / ETF BET), question chips, input |
-| Progres | `progress-screen.tsx` | projection chart (static SVG), contribution slider, all pensions in one place, monthly history |
-| Profil | `profile-screen.tsx` | risk profile, rules, connected bank, dark-mode toggle |
+| `/` | `page.tsx` | landing: hook, rotating 3D scene, how it works, sourced facts, business model |
+| `/login`, `/register` | `login/`, `register/` | auth + "Log in as Andrei (demo)" |
+| `/onboarding` | `onboarding/` | statement upload → 3 questions → reveal → piggy bank |
+| `/app` | `app/page.tsx` | loads `AppData` inside Suspense, renders `components/app/app-shell.tsx` |
+| `/terms` | `terms/page.tsx` | plain-English terms, the one-month hold and interest |
+| `/dev/scene` | `dev/scene/` | scene playground; hidden in production unless `ENABLE_DEV_PAGES=1` |
 
-Shared pieces (`Card`, `Header`, `BottomNav`, `Logo`) live in `components/app/shell.tsx`;
-`Tab` and the `money()` formatter in `components/app/types.ts`.
-
-## Known cleanups (pick these up as you touch each screen)
-
-- Code is v0-dense (one component per line). Reformat a screen before editing it.
-- Colors are inline hex values (`#33256c`, `#8c7ad9`…). Move them to theme tokens in
-  `app/globals.css` so the palette lives in one place.
-- The dark-mode toggle in Profil only flips its own switch; it doesn't change the theme yet.
-- The older screens still have Romanian copy; they are replaced in plan v2 (`docs/plan.md`).
-- The projection chart is a hard-coded SVG; replace it with real data from `lib/rules/`.
-- Chat, buttons and the slider are visual only. No API calls yet.
-- No onboarding flow yet (planned: bank connect, Pillar 2 upload, risk questions, rules).
-
-## Still to build (draft)
-
-1. Onboarding: bank connect, about you, Pillar 2 statement upload, risk questions, rules
-2. Real chat against `/api/chat`, with tool-result cards
-3. Explanations behind every number (sources & assumptions)
+Pages that read the session render inside `<Suspense>` (`cacheComponents` is on).
+Mutations are server actions next to the page (`app/app/actions.ts`, `app/onboarding/actions.ts`)
+and call `refresh()` from `next/cache` when the screen must update.

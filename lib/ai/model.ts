@@ -1,21 +1,24 @@
-// AI Model Provider Switch (gemini | groq | mock).
-// Uses Google AI Studio (gemini-3.5-flash-lite / gemini-3.8-flash) with a 25s timeout
-// so real LLM thinking responses complete cleanly without being prematurely aborted.
-
-import { AGENT_SYSTEM_PROMPT } from "./prompt";
+// AI model provider switch (gemini | groq | mock) and one function to call it.
+// Every caller passes a fallback, so the app works with AI_PROVIDER=mock and no keys.
 
 export type AiProvider = "gemini" | "groq" | "mock";
+
+// Verified working models on Google AI Studio for this account (fastest first).
+const GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const TIMEOUT_MS = 25_000;
 
 function cleanEnvKey(raw?: string): string {
   return (raw || "").trim().replace(/^["']|["']$/g, "");
 }
 
+function geminiKey() {
+  return cleanEnvKey(process.env.GOOGLE_GENERATIVE_AI_API_KEY) || cleanEnvKey(process.env.GEMINI_API_KEY);
+}
+
 export function getActiveAiProvider(): AiProvider {
   const envProvider = (process.env.AI_PROVIDER || "").toLowerCase().trim();
-  const hasGeminiKey = Boolean(
-    cleanEnvKey(process.env.GOOGLE_GENERATIVE_AI_API_KEY) ||
-      cleanEnvKey(process.env.GEMINI_API_KEY)
-  );
+  const hasGeminiKey = Boolean(geminiKey());
   const hasGroqKey = Boolean(cleanEnvKey(process.env.GROQ_API_KEY));
 
   if (envProvider === "gemini" && hasGeminiKey) return "gemini";
@@ -27,138 +30,85 @@ export function getActiveAiProvider(): AiProvider {
   return "mock";
 }
 
-// Verified working models on Google AI Studio for this account:
-// gemini-3.5-flash-lite (~8s) and gemini-3.8-flash (~10s)
-const GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
+export interface ModelRequest {
+  system: string;
+  prompt: string;
+  /** A PDF to read (Gemini only). */
+  pdfBase64?: string;
+  /** Ask for a JSON answer. */
+  json?: boolean;
+}
 
 /**
- * Calls Google AI Studio (Gemini) or Groq to generate a genuine LLM response,
- * grounded in the user's deterministic financial context from lib/rules.
+ * Sends one request to the active provider. Returns null on mock, on errors, or when the
+ * provider can't handle the request (Groq can't read PDFs): callers then use their fallback.
  */
-export async function generateNaturalLanguageExplanation(options: {
-  userMessage: string;
-  deterministicFacts: string;
-  fallbackResponseRo: string;
-}): Promise<{ text: string; provider: AiProvider }> {
+export async function callModel(request: ModelRequest): Promise<{ text: string; provider: AiProvider } | null> {
   const provider = getActiveAiProvider();
-
-  if (provider === "mock") {
-    return { text: options.fallbackResponseRo, provider: "mock" };
-  }
-
-  const prompt = `${AGENT_SYSTEM_PROMPT}
-
-CONTEXT FINANCIAR DETERMINIST AL UTILIZATORULUI (folosește aceste cifre când sunt relevante pentru întrebare):
-${options.deterministicFacts}
-
-MESAJUL UTILIZATORULUI:
-"${options.userMessage}"
-
-Instrucțiuni:
-- Răspunde în limba română, clar, prietenos și direct la subiectul întrebat de utilizator.
-- Dacă utilizatorul întreabă un concept financiar general (ex: „Ce e o obligațiune?”, „Ce e inflația?”, „Ce e un depozit?”, „Care e diferența dintre X și Y?”), explică acel concept clar și pe înțelesul tuturor, fără să deviezi la ETF-uri dacă nu a întrebat de ETF-uri.
-- Dacă întrebarea este legată de cifrele sau setările lui din aplicație, folosește exact cifrele din CONTEXT FINANCIAR DETERMINIST.
-- Folosește **bold** pentru ideile sau cifrele importante. Fii concis (2-3 paragrafe scurte).`;
-
   try {
-    if (provider === "gemini") {
-      const apiKey =
-        cleanEnvKey(process.env.GOOGLE_GENERATIVE_AI_API_KEY) ||
-        cleanEnvKey(process.env.GEMINI_API_KEY);
-      if (!apiKey) {
-        return { text: options.fallbackResponseRo, provider: "mock" };
-      }
-
-      for (const modelName of GEMINI_MODELS) {
-        try {
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: AbortSignal.timeout(25000),
-              body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                  temperature: 0.35,
-                  maxOutputTokens: 1200,
-                },
-              }),
-            }
-          );
-
-          if (!response.ok) {
-            continue;
-          }
-
-          const data = (await response.json()) as {
-            candidates?: Array<{
-              content?: {
-                parts?: Array<{ text?: string; thought?: boolean }>;
-              };
-            }>;
-          };
-
-          const parts = data.candidates?.[0]?.content?.parts ?? [];
-          const nonThoughtParts = parts.filter((p) => !p.thought && p.text);
-          const text = (
-            nonThoughtParts.length > 0
-              ? nonThoughtParts.map((p) => p.text).join("\n")
-              : parts.map((p) => p.text ?? "").join("\n")
-          ).trim();
-
-          if (text) {
-            return { text, provider: "gemini" };
-          }
-        } catch {
-          continue;
-        }
-      }
-    }
-
-    if (provider === "groq") {
-      const apiKey = cleanEnvKey(process.env.GROQ_API_KEY);
-      if (!apiKey) {
-        return { text: options.fallbackResponseRo, provider: "mock" };
-      }
-
-      const response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          signal: AbortSignal.timeout(20000),
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            temperature: 0.35,
-            max_tokens: 600,
-            messages: [
-              { role: "system", content: AGENT_SYSTEM_PROMPT },
-              {
-                role: "user",
-                content: `CONTEXT FINANCIAR:\n${options.deterministicFacts}\n\nMESAJ UTILIZATOR: ${options.userMessage}`,
-              },
-            ],
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = (await response.json()) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        const text = data.choices?.[0]?.message?.content?.trim();
-        if (text) {
-          return { text, provider: "groq" };
-        }
-      }
-    }
+    if (provider === "gemini") return await callGemini(request);
+    if (provider === "groq" && !request.pdfBase64) return await callGroq(request);
   } catch {
-    // Fallback if offline
+    // Offline, timeout or a bad response: fall through to the caller's fallback.
   }
+  return null;
+}
 
-  return { text: options.fallbackResponseRo, provider: "mock" };
+async function callGemini({ system, prompt, pdfBase64, json }: ModelRequest) {
+  const parts: object[] = [{ text: prompt }];
+  if (pdfBase64) parts.push({ inlineData: { mimeType: "application/pdf", data: pdfBase64 } });
+
+  for (const model of GEMINI_MODELS) {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey()}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: system }] },
+          contents: [{ role: "user", parts }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 800,
+            ...(json ? { responseMimeType: "application/json" } : {}),
+          },
+        }),
+      }
+    );
+    if (!response.ok) continue;
+
+    const data = (await response.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string; thought?: boolean }> } }>;
+    };
+    const answer = (data.candidates?.[0]?.content?.parts ?? [])
+      .filter((part) => !part.thought && part.text)
+      .map((part) => part.text)
+      .join("\n")
+      .trim();
+    if (answer) return { text: answer, provider: "gemini" as const };
+  }
+  return null;
+}
+
+async function callGroq({ system, prompt, json }: ModelRequest) {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${cleanEnvKey(process.env.GROQ_API_KEY)}` },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.3,
+      max_tokens: 600,
+      ...(json ? { response_format: { type: "json_object" } } : {}),
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: prompt },
+      ],
+    }),
+  });
+  if (!response.ok) return null;
+  const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const answer = data.choices?.[0]?.message?.content?.trim();
+  return answer ? { text: answer, provider: "groq" as const } : null;
 }

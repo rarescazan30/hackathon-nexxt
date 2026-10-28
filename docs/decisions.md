@@ -24,3 +24,16 @@ Raiffeisen or a licensed partner executes. Stripe shows the automatic collection
 
 **2026-10-28 – Positioning: not a budgeting app.** The home screen shows days of
 freedom and the jar, not spending categories.
+
+**2026-10-28 – Plan v2: retirement lifestyle app.** One problem (people can't picture
+retirement), one product (Pillar III), one loop (round-ups → monthly yes → scene levels
+up). Replaces risk profiles, ETF/bond allocation and the chat agent. Details: `docs/plan.md`.
+
+**2026-10-28 – Business model: interest on a one-month hold.** Mentor's advice. A licensed
+banking partner holds each confirmed amount for one month; the interest is our revenue.
+Disclosed on the confirm screen and in `/terms`.
+
+**2026-10-28 – All app text in English.** Money shown as `1,293.50 RON`.
+
+**2026-10-28 – Low-poly 3D in code.** three.js + react-three-fiber with primitives only,
+no model files; 2D fallback without WebGL.

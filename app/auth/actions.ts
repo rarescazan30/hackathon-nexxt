@@ -13,8 +13,7 @@ export interface AuthState {
 }
 
 const AFTER_LOGIN = '/app'
-// Becomes '/onboarding' once the onboarding flow exists (plan step 5).
-const AFTER_SIGN_UP = '/app'
+const AFTER_SIGN_UP = '/onboarding'
 
 const MIN_PASSWORD_LENGTH = 8
 

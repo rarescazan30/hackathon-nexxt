@@ -1,8 +1,6 @@
-// Public entrypoint for the AI Agent & Tool Calling module (Task 2).
+// Public entrypoint for lib/ai: the provider switch, the monthly offer message and
+// the pension statement reader (docs/plan.md, phase A4).
 
 export * from "./model";
-export * from "./prompt";
-export * from "./tools";
-export * from "./agent";
-export * from "./state-sync";
-
+export * from "./monthly-message";
+export * from "./extract-statement";

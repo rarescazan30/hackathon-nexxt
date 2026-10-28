@@ -92,7 +92,7 @@ async function seedProfile(userId: string) {
     await db.from('pension_assets').insert({
       user_id: userId,
       type: 'pillar2',
-      provider: 'NN Pensii (Pillar II)',
+      provider: 'NN Pensii',
       balance_bani: persona.pillarTwoBani,
       source: 'statement_upload',
       as_of: '2026-09-30',
@@ -101,7 +101,10 @@ async function seedProfile(userId: string) {
 }
 
 async function seedTransactions(userId: string) {
-  const generated = MONTHS.flatMap((month, i) => transactionsForMonth(month, i, persona.salaryBani))
+  // The current month's salary comes from the persona's sample transactions instead.
+  const generated = MONTHS.flatMap((month, i) =>
+    transactionsForMonth(month, i, persona.salaryBani, { includeSalary: month !== CURRENT_MONTH }),
+  )
 
   // The persona's sample transactions are the ones Ana's tests check, so they go in as-is.
   const fromPersona = persona.sampleTransactions.map((raw: unknown) => {

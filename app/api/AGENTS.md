@@ -23,12 +23,8 @@ stay thin: validate input, call `lib/*`, return the result.
 - Stripe is **test mode only** (`sk_test_...`).
 - Secrets only from `process.env`, server-side. Never expose them to the client.
 
-## Planned routes (draft)
+## Routes
 
-- `POST /api/onboarding`: save risk profile and settings
-- `POST /api/stripe/setup`: start saving a card
-- `POST /api/stripe/webhook`: Stripe events
-- `POST /api/cron/monthly`: collect jars and create orders (also used by the demo button)
-- `GET  /api/dashboard`: days of freedom, jar, timeline
-- `POST /api/chat`: the "what if…?" agent (streams; logic in `lib/ai/`)
-- `POST /api/statements`: upload a bank statement for extraction
+None yet. Plan v2 uses **server actions** next to the pages instead
+(`app/app/actions.ts`, `app/onboarding/actions.ts`) and `app/auth/signout/route.ts`.
+Add a route here only for callers that aren't our own pages (Stripe webhook, cron).

@@ -25,11 +25,6 @@ data/corpus/    official source documents for RAG (PDF/HTML/MD)
 
 ## Files
 
-- `mock/ui.ts`: mock data the prototype screens import today (user, activity, history,
-  projection, allocation). Replace piece by piece with data from the API.
-
-Planned (draft):
-
-- `mock/psd2_<persona>.json`: 6 months of transactions
-- `personas/<persona>.json`: profile, risk level, expected round-ups and days of freedom
-- `mock/products.json`: products per risk level with historical unit prices
+- `personas/<persona>.json`: demo personas and their expected results (used by tests).
+  Andrei (34) is the demo user created by `npm run seed`.
+- Mock bank transactions are generated in code: `lib/server/mock-bank.ts`.
