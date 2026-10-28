@@ -5,6 +5,11 @@ One short entry per decision, newest first. Format:
 
 ---
 
+**2026-10-28 – Frontend starts from the v0 prototype.** Merged into the repo on npm and
+our existing Next.js/ESLint config (v0's pnpm setup and `ignoreBuildErrors` were dropped).
+The single page was split into one file per tab in `components/app/` so people can work
+in parallel. Original export kept outside the repo in `../v0-prototype-original`.
+
 **2026-10-28 – One Next.js + TypeScript app, deployed on Vercel.** One language, shared
 types between UI and backend, free hosting, no separate backend server.
 Alternative: FastAPI (Python) backend on Railway/Render; rejected because we don't do

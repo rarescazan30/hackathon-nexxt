@@ -64,14 +64,24 @@ versions: check the installed version and its docs before writing code.
 ```
 app/             UI routes (pages, layouts)       → app/AGENTS.md
 app/api/         backend route handlers            → app/api/AGENTS.md
-components/      reusable UI components            → components/AGENTS.md
+components/app/  the prototype screens (one file per tab) + shell
+components/ui/   shadcn/ui primitives (add with `npx shadcn add <name>`)
+                                                    → components/AGENTS.md
 lib/contracts.ts shared Zod schemas + types (the contract)
 lib/rules/       deterministic money math          → lib/rules/AGENTS.md
 lib/ai/          agent, tools, prompts, provider   → lib/ai/AGENTS.md
 lib/rag/         ingestion, retrieval, evals       → lib/rag/AGENTS.md
 data/            mock data, personas, RAG corpus   → data/AGENTS.md
+                 (data/mock/ui.ts feeds the prototype screens)
 docs/            idea, architecture, decisions, judging prep
 ```
+
+## Current state of the code
+
+The frontend starts from a **v0 prototype**: a single-page, mobile-first app with four
+tabs (Acasă, Agent, Progres, Profil), all driven by mock data in `data/mock/ui.ts`.
+Nothing is connected yet: no API routes, no AI, no database. See `app/AGENTS.md` for
+the known cleanups the prototype needs.
 
 ## How we work
 

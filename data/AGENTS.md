@@ -23,7 +23,12 @@ data/corpus/    official source documents for RAG (PDF/HTML/MD)
 - Every corpus document has its source URL and date recorded next to it.
 - Product price histories (funds, ETF, Pillar III) are static snapshots with a noted source.
 
-## Planned files (draft)
+## Files
+
+- `mock/ui.ts`: mock data the prototype screens import today (user, activity, history,
+  projection, allocation). Replace piece by piece with data from the API.
+
+Planned (draft):
 
 - `mock/psd2_<persona>.json`: 6 months of transactions
 - `personas/<persona>.json`: profile, risk level, expected round-ups and days of freedom
