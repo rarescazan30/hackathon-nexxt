@@ -2,6 +2,14 @@
 
 Owner: **Frontend Lead**. Read the root `AGENTS.md` and `app/AGENTS.md` first.
 
+## Layout
+
+- `components/app/`: the app's own screens and shell (from the v0 prototype). One file
+  per tab, so different people can work on different tabs without conflicts.
+- `components/ui/`: shadcn/ui primitives (style `base-nova`, built on Base UI, config in
+  `components.json`). Add new ones with `npx shadcn add <name>`; don't hand-edit them
+  unless needed.
+
 ## Rules
 
 - Components receive data as **props typed from `lib/contracts.ts`**. No fetching and no

@@ -20,10 +20,34 @@ Pages and layouts of the mobile-first app. Backend code lives in `app/api/` (sep
 - Reusable pieces go in `components/`; pages stay thin.
 - Text in Romanian by default; keep strings easy to translate to English.
 
-## Planned screens (draft)
+## Current state: the v0 prototype
 
-1. Onboarding: goal, horizon, 3 suitability questions → risk level, rounding rule, link card
-2. Home: days of freedom (range), jar this month, next automatic collection
-3. Timeline: monthly collections and where the money went
-4. "What if…?" chat with result cards
-5. Sources & assumptions
+`app/page.tsx` is a client component holding the active tab in state; the bottom nav
+switches between four screens in `components/app/`:
+
+| Tab | File | What it shows |
+|---|---|---|
+| Acasă | `home-screen.tsx` | days of freedom hero (+ "De unde vine cifra asta?" sheet), monthly jar, recent activity, agent suggestion |
+| Agent | `agent-screen.tsx` | agent message, monthly proposal card (Pilonul 3 / ETF BET), question chips, input |
+| Progres | `progress-screen.tsx` | projection chart (static SVG), contribution slider, all pensions in one place, monthly history |
+| Profil | `profile-screen.tsx` | risk profile, rules, connected bank, dark-mode toggle |
+
+Shared pieces (`Card`, `Header`, `BottomNav`, `Logo`) live in `components/app/shell.tsx`;
+`Tab` and the `money()` formatter in `components/app/types.ts`.
+
+## Known cleanups (pick these up as you touch each screen)
+
+- Code is v0-dense (one component per line). Reformat a screen before editing it.
+- Colors are inline hex values (`#33256c`, `#8c7ad9`…). Move them to theme tokens in
+  `app/globals.css` so the palette lives in one place.
+- The dark-mode toggle in Profil only flips its own switch; it doesn't change the theme yet.
+- Some mock labels in `data/mock/ui.ts` are in English; the UI should be Romanian.
+- The projection chart is a hard-coded SVG; replace it with real data from `lib/rules/`.
+- Chat, buttons and the slider are visual only. No API calls yet.
+- No onboarding flow yet (planned: bank connect, Pillar 2 upload, risk questions, rules).
+
+## Still to build (draft)
+
+1. Onboarding: bank connect, about you, Pillar 2 statement upload, risk questions, rules
+2. Real chat against `/api/chat`, with tool-result cards
+3. Explanations behind every number (sources & assumptions)
