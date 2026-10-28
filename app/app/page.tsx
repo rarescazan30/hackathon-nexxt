@@ -6,7 +6,7 @@ import { getAppData } from '@/lib/data/app-data'
 import { AppShell } from '@/components/app/app-shell'
 
 export const metadata: Metadata = {
-  title: 'zile. — Home',
+  title: 'LifeGrowth — Home',
 }
 
 // Logged-in users only: proxy.ts sends everyone else to /login.

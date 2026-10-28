@@ -1,6 +1,11 @@
-# PDF reader — how we read pension statements
+# PDF reader — pension statements and bank statements
 
 Status: **built**, works with a Gemini key. Without a key it returns sample values (demo safety net).
+
+Since v2.3 one upload box takes both kinds; the AI decides which it is (`lib/ai/extract-document.ts`):
+- **Pension statement** → provider, balance, date → the user checks → saved (flow below).
+- **Bank statement** → its transactions → card payments added to the history right away, skipping ones we already have (same day + amount + first word of the merchant; `lib/server/statement-import.ts`). Only the open month's round-ups change. Demo file: `data/demo/bank-statement-demo.pdf`.
+- If the AI fails on a pension upload, a manual card opens by itself.
 
 ## The flow, step by step
 

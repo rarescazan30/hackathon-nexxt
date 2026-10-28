@@ -21,7 +21,11 @@ export interface LifestyleSceneProps {
   className?: string
   /** Keep the last frame readable, so "Share my island" can take a picture of it. */
   snapshot?: boolean
+  /** 'wide' = a 4:3 box (Home), less tall than the default square. */
+  shape?: SceneShape
 }
+
+export type SceneShape = 'square' | 'wide'
 
 const SLOT_POSITIONS: Record<Slot, [number, number, number]> = {
   home: [0, 0, -1.0],
@@ -38,7 +42,10 @@ const DRAG_FRICTION = 4 // how fast a flick slows down (per second)
 const RESUME_AFTER_DRAG_MS = 2000 // the idle turn comes back this long after letting go
 const POP_SECONDS = 0.7
 const SPARKLE_SECONDS = 1.4
-const CAMERA_FIT = 8.6 // world units that fit across the smaller side of the canvas
+// World units that must fit across the canvas: smaller = bigger island on screen.
+const FIT_ACROSS = 7.4
+// In the wider 4:3 box (Home) the island is limited by the height instead.
+const FIT_DOWN = { square: 7.4, wide: 6.0 }
 
 /** easeOutBack: overshoots a little, then settles at 1. */
 function popScale(t: number) {
@@ -48,15 +55,15 @@ function popScale(t: number) {
 }
 
 /** Keeps the whole island in view whatever the canvas size. */
-function FitCamera() {
+function FitCamera({ shape }: { shape: SceneShape }) {
   const getState = useThree((state) => state.get)
   const size = useThree((state) => state.size)
   useEffect(() => {
     // Read the camera from the store: three.js objects are meant to be mutated.
     const { camera } = getState()
-    camera.zoom = Math.min(size.width, size.height) / CAMERA_FIT
+    camera.zoom = Math.min(size.width / FIT_ACROSS, size.height / FIT_DOWN[shape])
     camera.updateProjectionMatrix()
-  }, [getState, size])
+  }, [getState, size, shape])
   return null
 }
 
@@ -167,7 +174,7 @@ function Island({ slots, highlight, turning }: { slots: SlotTiers; highlight: Sl
   )
 }
 
-export function LifestyleScene({ slots, highlight = null, className = '', snapshot = false }: LifestyleSceneProps) {
+export function LifestyleScene({ slots, highlight = null, className = '', snapshot = false, shape = 'square' }: LifestyleSceneProps) {
   const container = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(true)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -191,7 +198,7 @@ export function LifestyleScene({ slots, highlight = null, className = '', snapsh
   return (
     <div
       ref={container}
-      className={`relative aspect-square w-full cursor-grab touch-pan-y select-none active:cursor-grabbing ${className}`}
+      className={`relative w-full cursor-grab ${shape === 'wide' ? 'aspect-[4/3]' : 'aspect-square'} touch-pan-y select-none active:cursor-grabbing ${className}`}
     >
       <Canvas
         gl={{ preserveDrawingBuffer: snapshot }}
@@ -203,7 +210,7 @@ export function LifestyleScene({ slots, highlight = null, className = '', snapsh
         fallback={<SceneFallback slots={slots} />}
         aria-label="Your retirement lifestyle scene"
       >
-        <FitCamera />
+        <FitCamera shape={shape} />
         <hemisphereLight args={['#ffffff', '#b9aee6', 0.9]} />
         <directionalLight
           position={[5, 9, 4]}

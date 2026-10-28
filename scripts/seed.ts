@@ -83,6 +83,8 @@ async function seedProfile(userId: string) {
         salary_percent_bp: SALARY_SHARE_BP,
         monthly_cap_bani: persona.monthlyCapBani,
         card_linked: true,
+        bank_name: 'Demo Bank',
+        bank_card_last4: '4821',
         onboarding_completed: true,
         terms_accepted_at: `${MONTHS[0]}-01T08:00:00Z`,
       })

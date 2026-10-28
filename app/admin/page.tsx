@@ -15,7 +15,7 @@ import { monthName } from '@/components/app/types'
 import { RevenueProjection } from './revenue-projection'
 
 export const metadata: Metadata = {
-  title: 'zile. — Admin',
+  title: 'LifeGrowth — Admin',
   robots: { index: false },
 }
 
@@ -62,7 +62,7 @@ async function AdminDashboard() {
     <>
       <header className="px-1 pb-2 pt-6">
         <p className={EYEBROW}>Admin</p>
-        <h1 className="text-[27px] font-semibold tracking-[-.04em]">How zile. is doing</h1>
+        <h1 className="text-[27px] font-semibold tracking-[-.04em]">How LifeGrowth is doing</h1>
         <p className="mt-2 text-sm text-[#706b7b] dark:text-[#aaa4b6]">
           We earn the interest on each month&rsquo;s money while our partner holds it (assumed {FLOAT_INTEREST_RATE * 100}% a year).
         </p>

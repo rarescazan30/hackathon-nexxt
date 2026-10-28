@@ -129,7 +129,7 @@ export async function payMonthWithCard(input: z.infer<typeof PayInput>): Promise
         payment_method: profile.stripe_payment_method_id,
         off_session: true,
         confirm: true,
-        description: `zile. ${jar.month} → Pillar III (held one month)`,
+        description: `LifeGrowth ${jar.month} → Pillar III (held one month)`,
         metadata: { jar_id: jar.id, user_id: user.id, month: jar.month },
       },
       // Pressing Yes twice can't charge twice (a new card or amount is a new attempt).

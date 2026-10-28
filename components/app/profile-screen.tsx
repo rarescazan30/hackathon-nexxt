@@ -116,7 +116,7 @@ export function ProfileScreen({ data }: { data: AppData }) {
             </li>
           ))}
           <li className="flex justify-between">
-            <span>Pillar III through zile.</span>
+            <span>Pillar III through LifeGrowth</span>
             <b>{formatRon(data.contributedBani, { wholeRon: true })}</b>
           </li>
         </ul>
@@ -127,7 +127,7 @@ export function ProfileScreen({ data }: { data: AppData }) {
           </p>
         )}
         <button onClick={() => setEditing(true)} className={`${SECONDARY_BUTTON} mt-4`}>
-          Update your details
+          Update details or add a PDF
         </button>
       </Card>
 

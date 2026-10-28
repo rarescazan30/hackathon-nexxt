@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 
 export const metadata: Metadata = {
-  title: 'zile. — Get started',
+  title: 'LifeGrowth — Get started',
 }
 
 // Logged-in users only (proxy.ts). Users who finished onboarding go straight to /app.

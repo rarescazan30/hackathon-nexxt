@@ -1,17 +1,17 @@
-// /terms: the short, plain-English terms, including how zile. makes money.
+// /terms: the short, plain-English terms, including how LifeGrowth makes money.
 // A hackathon draft, not legal text.
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Card, Logo } from '@/components/app/shell'
 
 export const metadata: Metadata = {
-  title: 'zile. — Terms',
+  title: 'LifeGrowth — Terms',
 }
 
 const SECTIONS = [
   {
-    title: 'What zile. does',
-    body: 'zile. rounds up your card payments and adds an optional share of your salary into a monthly counter. At the end of each month we suggest an amount to add to your Pillar III (voluntary) pension. Nothing leaves your account until you say yes.',
+    title: 'What LifeGrowth does',
+    body: 'LifeGrowth rounds up your card payments and adds an optional share of your salary into a monthly counter. At the end of each month we suggest an amount to add to your Pillar III (voluntary) pension. Nothing leaves your account until you say yes.',
   },
   {
     title: 'How the money moves',
@@ -19,7 +19,7 @@ const SECTIONS = [
   },
   {
     title: 'How we make money',
-    body: 'While your monthly amount is held for that one month, it earns interest. zile. and its banking partner keep that interest. This is what keeps the app free. You never pay a fee to zile., and the full amount you confirmed reaches your Pillar III.',
+    body: 'While your monthly amount is held for that one month, it earns interest. LifeGrowth and its banking partner keep that interest. This is what keeps the app free. You never pay a fee to LifeGrowth, and the full amount you confirmed reaches your Pillar III.',
   },
   {
     title: 'The one-month delay',
@@ -45,7 +45,7 @@ export default function TermsPage() {
         <header className="px-1 pb-2 pt-6">
           <p className="mb-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Terms</p>
           <h1 className="text-[27px] font-semibold tracking-[-.04em]">Plain-English terms</h1>
-          <p className="mt-2 text-sm text-[#706b7b] dark:text-[#aaa4b6]">Hackathon draft. The short version of how zile. works and how it makes money.</p>
+          <p className="mt-2 text-sm text-[#706b7b] dark:text-[#aaa4b6]">Hackathon draft. The short version of how LifeGrowth works and how it makes money.</p>
         </header>
         {SECTIONS.map((section) => (
           <Card key={section.title}>

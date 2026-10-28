@@ -12,15 +12,15 @@ import { LifestyleScene } from '@/components/scene'
 export async function generateMetadata({ params }: PageProps<'/i/[code]'>): Promise<Metadata> {
   const { code } = await params
   const card = await getShareCard(code)
-  if (!card) return { title: 'zile.' }
+  if (!card) return { title: 'LifeGrowth' }
 
   const title = `${card.firstName}'s retirement island · Level ${card.level}`
-  const description = 'See how you will live in retirement, and start saving for your pension with zile.'
+  const description = 'See how you will live in retirement, and start saving for your pension with LifeGrowth'
   const images = card.imageUrl ? [{ url: card.imageUrl, width: 1200, height: 630, alt: title }] : undefined
   return {
     title,
     description,
-    openGraph: { title, description, type: 'website', siteName: 'zile.', images },
+    openGraph: { title, description, type: 'website', siteName: 'LifeGrowth', images },
     twitter: { card: images ? 'summary_large_image' : 'summary', title, description, images: images?.map((image) => image.url) },
   }
 }
@@ -29,7 +29,7 @@ export default function SharedIslandPage({ params }: PageProps<'/i/[code]'>) {
   return (
     <main className="min-h-screen bg-[#f7f6f9] text-[#292431] dark:bg-[#18151f] dark:text-[#f8f6fb]">
       <div className="mx-auto w-full max-w-[960px] px-5 pt-6">
-        <Link href="/" aria-label="zile. home">
+        <Link href="/" aria-label="LifeGrowth home">
           <Logo />
         </Link>
       </div>

@@ -65,15 +65,17 @@ export function DetailsEditor({ data, onClose }: { data: AppData; onClose: () =>
           </button>
         </header>
         <p className="px-1 text-sm leading-6 text-[#706b7b] dark:text-[#aaa4b6]">
-          Got a raise or a new yearly statement? Update it here. Your days of freedom follow; your level never goes down.
+          Got a raise or a new yearly statement? Update it here. You can also upload a bank statement to add your latest card
+          payments. Your days of freedom follow; your level never goes down.
         </p>
 
         <Card>
           <AnswerFields answers={answers} update={(change) => setAnswers((prev) => ({ ...prev, ...change }))} />
         </Card>
 
-        <p className="mt-2 px-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Private pensions</p>
+        <p className="mt-2 px-1 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">From a PDF, or by hand</p>
         <PensionsEditor
+          accept="any"
           pensions={pensions}
           setPensions={setPensions}
           footer={(busy) => (

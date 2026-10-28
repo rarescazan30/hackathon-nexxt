@@ -1,7 +1,7 @@
 'use client'
 
-// Month tab: this month's counter or the month-end offer, the round-ups behind it, and
-// the history of past months (collected → with our partner → invested).
+// Month tab: this month's counter or the month-end offer, the card payments behind it
+// (last 3 months), and the history of past months (collected → with our partner → invested).
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Check, Clock3, FastForward, Sparkles } from 'lucide-react'
@@ -10,6 +10,7 @@ import type { AppData, JarSummary } from '@/lib/data/app-data'
 import { answerMonthlyOffer, simulateMonthEnd } from '@/app/app/actions'
 import { completeCardPayment, payMonthWithCard } from '@/app/app/card-actions'
 import { Card, Header } from '@/components/app/shell'
+import { PaymentHistory } from '@/components/app/payment-history'
 import { DemoBank } from '@/components/bank/demo-bank'
 import { getStripeJs } from '@/components/stripe/card-form'
 import { monthName, shortDate, type Tab } from '@/components/app/types'
@@ -113,13 +114,15 @@ function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
       <button onClick={() => answer(false)} disabled={pending} className="mt-3 w-full text-center text-xs font-medium text-[#858090]">
         Not this month
       </button>
-      <p className="mt-4 border-t border-dashed border-[#e2dfe8] pt-3 text-xs leading-5 text-[#858090] dark:border-[#353042] dark:text-[#a39cab]">
-        Your money stays with our banking partner for one month, then goes to your Pillar III. The interest from that month
-        keeps the app free.{' '}
-        <Link href="/terms" className="font-semibold text-[#5f4bb6] underline dark:text-[#a594f0]">
-          Terms
+      <div className="mt-4 border-t border-dashed border-[#e2dfe8] pt-3 dark:border-[#353042]">
+        <p className="text-xs leading-5 text-[#858090] dark:text-[#a39cab]">
+          Your money stays with our banking partner for one month, then goes to your Pillar III. The interest from that month
+          keeps the app free.
+        </p>
+        <Link href="/terms" className="pulse-hover mt-3 inline-flex w-fit items-center gap-1.5 rounded-xl bg-[#f1effa] px-3.5 py-2 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
+          Read the terms
         </Link>
-      </p>
+      </div>
     </Card>
   )
 }
@@ -197,7 +200,7 @@ function CurrentMonth({ jar, card, openSettings }: { jar: JarSummary; card: Save
 }
 
 export function MonthScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab) => void }) {
-  const { currentJar, roundups, history } = data
+  const { currentJar, history } = data
   return (
     <div className="flex flex-col gap-4">
       <Header title="This month" subtitle="Your piggy bank" />
@@ -205,24 +208,7 @@ export function MonthScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab
       {currentJar ? <CurrentMonth jar={currentJar} card={data.settings.card} openSettings={() => setTab('profile')} /> : <Card>No activity yet.</Card>}
       <SimulateButton />
 
-      {roundups.length > 0 && currentJar?.status === 'open' && (
-        <Card>
-          <p className="mb-3 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">Round-ups</p>
-          <ul className="divide-y divide-dashed divide-[#e2dfe8] dark:divide-[#353042]">
-            {roundups.map((roundup) => (
-              <li key={roundup.id} className="flex items-center justify-between py-2.5 text-sm animate-in fade-in slide-in-from-top-2 duration-500">
-                <div>
-                  <p className="font-medium">{roundup.counterparty}</p>
-                  <p className="text-xs text-[#858090] dark:text-[#a39cab]">
-                    {shortDate(roundup.date)} · {formatRon(roundup.spentBani)}
-                  </p>
-                </div>
-                <span className="font-semibold text-[#438565] dark:text-[#6bc495]">+{formatRon(roundup.roundupBani)}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
+      <PaymentHistory payments={data.payments} openMonth={currentJar?.month ?? null} connectBank={() => setTab('profile')} />
 
       {history.length > 0 && (
         <Card>

@@ -7,7 +7,8 @@ import { Check, CreditCard } from 'lucide-react'
 import { formatRon, roundUp } from '@/lib/rules'
 import { Card } from '@/components/app/shell'
 import { FormError } from '@/components/auth/form-parts'
-import { DEMO_ACCOUNT, DemoBank } from '@/components/bank/demo-bank'
+import { DemoBank, OPEN_BANKING } from '@/components/bank/demo-bank'
+import { BankStatementUpload } from './bank-statement-upload'
 import { PRIMARY_BUTTON, type OnboardingDraft } from './onboarding-state'
 
 const ROUNDUP_OPTIONS: { bani: OnboardingDraft['roundupRuleBani']; label: string }[] = [
@@ -19,7 +20,7 @@ const ROUNDUP_OPTIONS: { bani: OnboardingDraft['roundupRuleBani']; label: string
 const SALARY_OPTIONS = [0, 100, 300, 500]
 const EXAMPLE_PAYMENT_BANI = 1230 // a coffee
 
-type Settings = Pick<OnboardingDraft, 'roundupRuleBani' | 'salaryPercentBp' | 'cardLinked' | 'termsAccepted'>
+type Settings = Pick<OnboardingDraft, 'roundupRuleBani' | 'salaryPercentBp' | 'cardLinked' | 'bank' | 'termsAccepted'>
 
 function Choice({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -68,9 +69,9 @@ export function PiggyBankStep({ draft, update, onFinish, pending, error }: { dra
         <DemoBank
           mode="consent"
           onClose={() => setConnecting(false)}
-          onConfirm={() => {
+          onConfirm={(bank) => {
             setConnecting(false)
-            update({ cardLinked: true })
+            update({ cardLinked: true, bank })
           }}
         />
       )}
@@ -85,24 +86,35 @@ export function PiggyBankStep({ draft, update, onFinish, pending, error }: { dra
           {draft.cardLinked ? <Check size={18} /> : <CreditCard size={18} />}
         </span>
         <span>
-          <b className="block">{draft.cardLinked ? 'Card connected' : 'Connect your card'}</b>
+          <b className="block">{draft.cardLinked ? 'Bank connected' : 'Connect your bank'}</b>
           <span className="text-xs text-[#858090] dark:text-[#a39cab]">
-            {draft.cardLinked ? `${DEMO_ACCOUNT.bank} · ${DEMO_ACCOUNT.card}` : 'Demo: a sample bank with this month’s payments'}
+            {draft.cardLinked && draft.bank
+              ? `${draft.bank.bankName} · card •• ${draft.bank.cardLast4} · last 90 days imported`
+              : `${OPEN_BANKING}: reads your card payments for round-ups`}
           </span>
         </span>
       </button>
 
-      <label className="flex items-start gap-3 px-1 text-xs leading-5 text-[#706b7b] dark:text-[#aaa4b6]">
-        <input type="checkbox" checked={draft.termsAccepted} onChange={(e) => update({ termsAccepted: e.target.checked })} className="mt-0.5 size-4 accent-[#6f5cc1]" />
-        <span>
-          I agree to the{' '}
-          <Link href="/terms" target="_blank" className="font-semibold text-[#5f4bb6] underline dark:text-[#a594f0]">
-            terms
-          </Link>
-          : each month I choose to add money, our banking partner holds it for one month and zile. keeps the interest, then it goes
-          to my Pillar III.
-        </span>
-      </label>
+      {!draft.cardLinked && <BankStatementUpload />}
+
+      <p className="px-1 text-xs leading-5 text-[#858090] dark:text-[#a39cab]">
+        Open Banking only <b>reads</b> your payments to count round-ups. Paying happens at the end of the month, by card (Stripe) or
+        bank transfer, and only when you say yes.
+      </p>
+
+      {/* The terms link sits outside the label, so tapping it doesn't tick the box. */}
+      <div className="flex flex-col gap-2 px-1">
+        <label className="flex items-start gap-3 text-xs leading-5 text-[#706b7b] dark:text-[#aaa4b6]">
+          <input type="checkbox" checked={draft.termsAccepted} onChange={(e) => update({ termsAccepted: e.target.checked })} className="mt-0.5 size-4 accent-[#6f5cc1]" />
+          <span>
+            I agree to the terms: each month I choose to add money, our banking partner holds it for one month and LifeGrowth keeps the
+            interest, then it goes to my Pillar III.
+          </span>
+        </label>
+        <Link href="/terms" target="_blank" className="pulse-hover ml-7 inline-flex w-fit items-center gap-1.5 rounded-xl bg-[#f1effa] px-3.5 py-2 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
+          Read the terms
+        </Link>
+      </div>
 
       <FormError message={error} />
       <button onClick={onFinish} disabled={pending || !draft.termsAccepted} className={PRIMARY_BUTTON}>

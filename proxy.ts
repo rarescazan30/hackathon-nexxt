@@ -5,7 +5,8 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 const PROTECTED_ROUTES = ['/app', '/onboarding', '/admin']
-const AUTH_ROUTES = ['/login', '/register']
+// /register stays reachable when logged in: it offers "Log out and create a new account".
+const AUTH_ROUTES = ['/login']
 
 function matches(pathname: string, routes: string[]) {
   return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`))

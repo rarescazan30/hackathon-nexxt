@@ -261,6 +261,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          bank_card_last4: string | null
+          bank_name: string | null
           birth_year: number | null
           card_brand: string | null
           card_last4: string | null
@@ -284,6 +286,8 @@ export type Database = {
           years_worked: number | null
         }
         Insert: {
+          bank_card_last4?: string | null
+          bank_name?: string | null
           birth_year?: number | null
           card_brand?: string | null
           card_last4?: string | null
@@ -307,6 +311,8 @@ export type Database = {
           years_worked?: number | null
         }
         Update: {
+          bank_card_last4?: string | null
+          bank_name?: string | null
           birth_year?: number | null
           card_brand?: string | null
           card_last4?: string | null

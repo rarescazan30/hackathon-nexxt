@@ -33,7 +33,7 @@ export function HomeScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab)
       </Card>
 
       <Card className="overflow-hidden p-0">
-        <div className="px-5 pt-5">
+        <div className="px-5 pt-4">
           <span className="inline-flex whitespace-nowrap rounded-full bg-[#f1effa] px-3 py-1 text-xs font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
             Level {level.level}
           </span>
@@ -43,9 +43,9 @@ export function HomeScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab)
           </p>
         </div>
         <div data-share-scene>
-          <LifestyleScene slots={level.slots} snapshot />
+          <LifestyleScene slots={level.slots} snapshot shape="wide" />
         </div>
-        <div className="px-5 pb-5">
+        <div className="px-5 pb-4">
           <div className="h-2 overflow-hidden rounded-full bg-[#e8e3f7] dark:bg-[#2b253a]">
             <div className="h-full rounded-full bg-[#6f5cc1] transition-all duration-700" style={{ width: `${progress}%` }} />
           </div>
@@ -57,7 +57,7 @@ export function HomeScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab)
               </span>
             )}
           </div>
-          <div className="mt-4">
+          <div className="mt-3">
             <ShareIsland firstName={data.user.firstName} level={level.level} />
           </div>
         </div>

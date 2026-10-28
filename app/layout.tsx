@@ -3,7 +3,7 @@ import './globals.css'
 import { ThemeSync } from '@/components/theme-sync'
 
 export const metadata: Metadata = {
-  title: 'zile. — How will you live in retirement?',
+  title: 'LifeGrowth — How will you live in retirement?',
   description: 'Round up your card payments, grow your Pillar III pension, and see how you will live in retirement.',
   icons: {
     icon: [

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { ScenePlayground } from './scene-playground'
 
 export const metadata: Metadata = {
-  title: 'zile. — Scene playground',
+  title: 'LifeGrowth — Scene playground',
 }
 
 // /dev/scene: a preview of the 3D scene for building the models. Not part of the product:

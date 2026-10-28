@@ -37,6 +37,8 @@ export interface ModelRequest {
   pdfBase64?: string;
   /** Ask for a JSON answer. */
   json?: boolean;
+  /** Longer answers, e.g. a list of transactions (default 800 tokens). */
+  maxOutputTokens?: number;
 }
 
 /**
@@ -54,7 +56,7 @@ export async function callModel(request: ModelRequest): Promise<{ text: string; 
   return null;
 }
 
-async function callGemini({ system, prompt, pdfBase64, json }: ModelRequest) {
+async function callGemini({ system, prompt, pdfBase64, json, maxOutputTokens = 800 }: ModelRequest) {
   const parts: object[] = [{ text: prompt }];
   if (pdfBase64) parts.push({ inlineData: { mimeType: "application/pdf", data: pdfBase64 } });
 
@@ -70,7 +72,7 @@ async function callGemini({ system, prompt, pdfBase64, json }: ModelRequest) {
           contents: [{ role: "user", parts }],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 800,
+            maxOutputTokens,
             ...(json ? { responseMimeType: "application/json" } : {}),
           },
         }),

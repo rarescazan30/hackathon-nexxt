@@ -55,6 +55,7 @@ export function OnboardingFlow({ firstName }: { firstName: string }) {
           roundupRuleBani: draft.roundupRuleBani,
           salaryPercentBp: draft.salaryPercentBp,
           cardLinked: draft.cardLinked,
+          bank: draft.cardLinked ? draft.bank : undefined,
           termsAccepted: true,
         })
       } catch (e) {

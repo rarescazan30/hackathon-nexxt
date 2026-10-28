@@ -92,3 +92,25 @@ export async function importMockMonth(
     .map((row) => ({ ...row, currency: 'RON', user_id: userId }))
   unwrap(await db.from('transactions').upsert(rows, { onConflict: 'user_id,external_id', ignoreDuplicates: true }))
 }
+
+/** How far back a new bank connection reads, like a real PSD2 consent (90 days ≈ 3 months). */
+export const HISTORY_MONTHS = 3
+
+function addMonths(month: string, delta: number) {
+  const [year, monthNumber] = month.split('-').map(Number)
+  const date = new Date(Date.UTC(year, monthNumber - 1 + delta, 1))
+  return date.toISOString().slice(0, 7)
+}
+
+/**
+ * "Connect your bank": the bank sends the last 3 months of payments plus this month so far.
+ * `month` is the user's current month (a simulated month can be ahead of the real date).
+ */
+export async function importBankHistory(db: SupabaseClient<Database>, userId: string, month: string, salaryBani: number) {
+  for (let back = HISTORY_MONTHS; back >= 1; back--) {
+    await importMockMonth(db, userId, addMonths(month, -back), salaryBani)
+  }
+  const now = new Date()
+  const isRealMonth = month === now.toISOString().slice(0, 7)
+  await importMockMonth(db, userId, month, salaryBani, { untilDay: isRealMonth ? now.getUTCDate() : 31 })
+}

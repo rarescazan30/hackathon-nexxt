@@ -1,95 +1,162 @@
 'use client'
 
-// "Banca Demo": the fake bank screens that make the demo feel like a real PSD2 flow
-// (docs/BANK_IMPLEMENTATION.md). Clearly labelled as a demo; nothing real is connected.
-//   consent: pick an account, confirm with any 4-digit code → "card connected"
-//   payment: confirm the month's transfer, like strong customer authentication (SCA)
+// "Open Banking (demo)": the screens of a PSD2 bank connection, with fictional banks and
+// data (docs/BANK_IMPLEMENTATION.md). Same look as the Stripe card sheet on purpose:
+//   consent: pick your bank → pick the card you pay with → allow read access
+//   payment: confirm the month's transfer (when no Stripe card is saved)
+// Open Banking only READS payments (for round-ups). Paying is Stripe's job.
 import { useState } from 'react'
-import { Check, Landmark, Lock, X } from 'lucide-react'
+import { Check, Eye, Landmark, Lock, X } from 'lucide-react'
+import type { BankChoice } from '@/lib/server/profile-data'
+import { PRIMARY_BUTTON } from '@/components/onboarding/onboarding-state'
 
-export const DEMO_ACCOUNT = {
-  bank: 'Banca Demo',
-  iban: 'RO49 DEMO 0000 1234 5678',
-  card: 'Visa •• 4821',
-}
+export const OPEN_BANKING = 'Open Banking (demo)'
 
+// Fictional banks: no real bank names or logos in the demo.
+const BANKS = ['Demo Bank', 'Nova Bank', 'Danube Bank']
 const CODE_LENGTH = 4
 
-type DemoBankProps =
-  | { mode: 'consent'; onConfirm: () => void; onClose: () => void }
+// Fixed light colours, like the Stripe card sheet.
+const LIGHT_INPUT = 'w-full rounded-xl border border-[#e2dfe8] bg-[#f7f6f9] px-3.5 py-3 text-base text-[#292431] outline-none focus:border-[#6f5cc1]'
+const LIGHT_LABEL = 'mb-1.5 block text-xs font-medium text-[#706b7b]'
+
+type Props =
+  | { mode: 'consent'; onConfirm: (choice: BankChoice) => void; onClose: () => void }
   | { mode: 'payment'; amount: string; onConfirm: () => void; onClose: () => void }
 
-export function DemoBank(props: DemoBankProps) {
-  const [step, setStep] = useState<'account' | 'code'>(props.mode === 'consent' ? 'account' : 'code')
-  const [code, setCode] = useState('')
-  const codeOk = new RegExp(`^\\d{${CODE_LENGTH}}$`).test(code)
-
+function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#18151f]/50 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-label={DEMO_ACCOUNT.bank}>
-      <div className="w-full max-w-[430px] rounded-t-[28px] bg-white p-6 pb-[calc(24px+env(safe-area-inset-bottom))] text-[#1f2a37] shadow-2xl animate-in slide-in-from-bottom-8 duration-300 sm:rounded-[28px]">
-        {/* A bank-looking header in its own colours, so it reads as "now you are at your bank". */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-[#0b6e4f] text-white">
-              <Landmark size={18} />
-            </span>
-            <div>
-              <p className="text-sm font-bold">{DEMO_ACCOUNT.bank}</p>
-              <p className="text-xs text-[#6b7280]">Demo bank · not a real bank</p>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#18151f]/50 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-label={OPEN_BANKING}>
+      <div className="w-full max-w-[430px] rounded-t-[28px] bg-white p-6 pb-[calc(24px+env(safe-area-inset-bottom))] text-[#292431] shadow-2xl animate-in slide-in-from-bottom-8 duration-300 sm:rounded-[28px]">
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{OPEN_BANKING}</p>
+            <h2 className="text-xl font-semibold tracking-[-.02em]">{title}</h2>
           </div>
-          <button onClick={props.onClose} aria-label="Cancel" className="flex size-9 items-center justify-center rounded-full bg-[#f3f4f6]">
+          <button onClick={onClose} aria-label="Close" className="flex size-9 items-center justify-center rounded-full bg-[#f1effa]">
             <X size={16} />
           </button>
         </div>
-
-        {step === 'account' ? (
-          <>
-            <h2 className="mt-6 text-lg font-bold">zile. wants to read your card payments</h2>
-            <p className="mt-1 text-sm text-[#6b7280]">Only to calculate round-ups. zile. can&rsquo;t move money without asking you each month.</p>
-            <div className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-[#0b6e4f] bg-[#ecfdf5] p-4">
-              <Check size={18} className="text-[#0b6e4f]" />
-              <div className="text-sm">
-                <p className="font-semibold">Current account · {DEMO_ACCOUNT.card}</p>
-                <p className="text-xs text-[#6b7280]">{DEMO_ACCOUNT.iban}</p>
-              </div>
-            </div>
-            <button onClick={() => setStep('code')} className="pulse-hover mt-5 w-full rounded-xl bg-[#0b6e4f] py-3 text-sm font-semibold text-white">
-              Continue
-            </button>
-          </>
-        ) : (
-          <>
-            <h2 className="mt-6 text-lg font-bold">
-              {props.mode === 'payment' ? `Confirm payment of ${props.amount}` : 'Confirm access'}
-            </h2>
-            <p className="mt-1 text-sm text-[#6b7280]">
-              {props.mode === 'payment'
-                ? `From ${DEMO_ACCOUNT.iban} to the zile. partner account. It reaches your Pillar III in one month.`
-                : 'Access lasts 180 days. You can remove it any time in your bank app.'}
-            </p>
-            <label className="mt-4 block text-xs font-medium text-[#6b7280]" htmlFor="bank-code">
-              Code from your bank app (demo: any {CODE_LENGTH} digits)
-            </label>
-            <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-[#d1d5db] px-3.5 focus-within:border-[#0b6e4f]">
-              <Lock size={15} className="text-[#6b7280]" />
-              <input
-                id="bank-code"
-                inputMode="numeric"
-                autoComplete="off"
-                maxLength={CODE_LENGTH}
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                className="w-full bg-transparent py-3 text-base tracking-[.5em] outline-none"
-                autoFocus
-              />
-            </div>
-            <button onClick={props.onConfirm} disabled={!codeOk} className="pulse-hover mt-5 w-full rounded-xl bg-[#0b6e4f] py-3 text-sm font-semibold text-white disabled:opacity-50">
-              {props.mode === 'payment' ? 'Confirm payment' : 'Allow access'}
-            </button>
-          </>
-        )}
+        {children}
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-[#858090]">
+          <Lock size={12} /> Demo bank connection · fictional data
+        </p>
       </div>
     </div>
+  )
+}
+
+function CodeField({ code, setCode }: { code: string; setCode: (code: string) => void }) {
+  return (
+    <div>
+      <label className={LIGHT_LABEL} htmlFor="bank-code">
+        Code from your bank app (demo: any {CODE_LENGTH} digits)
+      </label>
+      <input
+        id="bank-code"
+        inputMode="numeric"
+        autoComplete="off"
+        maxLength={CODE_LENGTH}
+        value={code}
+        onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+        className={`${LIGHT_INPUT} tracking-[.5em]`}
+        autoFocus
+      />
+    </div>
+  )
+}
+
+export function DemoBank(props: Props) {
+  const [step, setStep] = useState<'bank' | 'card' | 'allow'>('bank')
+  const [bankName, setBankName] = useState(BANKS[0])
+  const [cardLast4, setCardLast4] = useState('')
+  const [code, setCode] = useState('')
+  const codeOk = code.length === CODE_LENGTH
+
+  if (props.mode === 'payment') {
+    return (
+      <Sheet title={`Confirm payment of ${props.amount}`} onClose={props.onClose}>
+        <p className="mb-4 text-sm leading-6 text-[#706b7b]">
+          From your bank account to the LifeGrowth partner account. It reaches your Pillar III in one month.
+        </p>
+        <CodeField code={code} setCode={setCode} />
+        <button onClick={props.onConfirm} disabled={!codeOk} className={`${PRIMARY_BUTTON} mt-4`}>
+          Confirm payment
+        </button>
+      </Sheet>
+    )
+  }
+
+  if (step === 'bank') {
+    return (
+      <Sheet title="Choose your bank" onClose={props.onClose}>
+        <div className="flex flex-col gap-2">
+          {BANKS.map((bank) => (
+            <button
+              key={bank}
+              onClick={() => setBankName(bank)}
+              aria-pressed={bankName === bank}
+              className={`flex items-center gap-3 rounded-2xl border-2 p-3.5 text-left text-sm font-semibold ${bankName === bank ? 'border-[#6f5cc1] bg-[#f1effa]' : 'border-[#e2dfe8]'}`}
+            >
+              <span className="flex size-9 items-center justify-center rounded-xl bg-[#33256c] text-white">
+                <Landmark size={16} />
+              </span>
+              {bank}
+              {bankName === bank && <Check size={16} className="ml-auto text-[#6f5cc1]" />}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setStep('card')} className={`${PRIMARY_BUTTON} mt-4`}>
+          Continue
+        </button>
+      </Sheet>
+    )
+  }
+
+  if (step === 'card') {
+    return (
+      <Sheet title="Which card do you pay with?" onClose={props.onClose}>
+        <p className="mb-4 text-sm leading-6 text-[#706b7b]">
+          {bankName} shows us the payments made with this card. Only the last 4 digits: the bank already knows the rest.
+        </p>
+        <label className={LIGHT_LABEL} htmlFor="card-last4">
+          Last 4 digits of your card
+        </label>
+        <input
+          id="card-last4"
+          inputMode="numeric"
+          maxLength={4}
+          value={cardLast4}
+          onChange={(e) => setCardLast4(e.target.value.replace(/\D/g, ''))}
+          placeholder="4821"
+          className={`${LIGHT_INPUT} tracking-[.3em]`}
+          autoFocus
+        />
+        <button onClick={() => setStep('allow')} disabled={cardLast4.length !== 4} className={`${PRIMARY_BUTTON} mt-4`}>
+          Continue
+        </button>
+      </Sheet>
+    )
+  }
+
+  return (
+    <Sheet title="Allow LifeGrowth to read your payments" onClose={props.onClose}>
+      <ul className="mb-4 flex flex-col gap-2.5 text-sm leading-6 text-[#706b7b]">
+        <li className="flex gap-2.5">
+          <Eye size={16} className="mt-1 shrink-0 text-[#6f5cc1]" />
+          <span>
+            Read payments made with card <b className="text-[#292431]">•• {cardLast4}</b>: the last 90 days and new ones from now on.
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <Lock size={16} className="mt-1 shrink-0 text-[#6f5cc1]" />
+          <span>Read only: Open Banking can&rsquo;t move money. Access lasts 180 days.</span>
+        </li>
+      </ul>
+      <CodeField code={code} setCode={setCode} />
+      <button onClick={() => props.onConfirm({ bankName, cardLast4 })} disabled={!codeOk} className={`${PRIMARY_BUTTON} mt-4`}>
+        Allow access
+      </button>
+    </Sheet>
   )
 }

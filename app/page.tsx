@@ -1,10 +1,12 @@
 // Landing page: the question, one line, Sign up / Log in and the island. Everything else waits behind
 // "Find out more", so the first contact stays clean.
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { CreditCard, Landmark, ShieldCheck, Sparkles } from 'lucide-react'
 import { Card, Logo } from '@/components/app/shell'
 import { FindOutMore } from '@/components/landing/find-out-more'
 import { HeroScene } from '@/components/landing/hero-scene'
+import { LandingButtons, LoggedOutButtons } from '@/components/auth/session-buttons'
 
 // Every number has its source next to it (same constants as lib/rules/config.ts).
 const FACTS = [
@@ -32,14 +34,9 @@ export default function LandingPage() {
               Upload your pension statement, answer 3 questions, and see your retirement in a minute. Then grow it with your
               card&rsquo;s round-ups.
             </p>
-            <div className="flex max-w-[360px] flex-col gap-3">
-              <Link href="/register" className="pulse-hover w-full rounded-xl bg-[#33256c] py-3 text-center text-sm font-semibold text-white dark:bg-[#6f5cc1]">
-                Sign up
-              </Link>
-              <Link href="/login" className="pulse-hover w-full rounded-xl bg-white py-3 text-center text-sm font-semibold text-[#33256c] dark:bg-[#211d2b] dark:text-white">
-                Log in
-              </Link>
-            </div>
+            <Suspense fallback={<LoggedOutButtons />}>
+              <LandingButtons />
+            </Suspense>
           </div>
           <Card className="overflow-hidden p-0">
             <HeroScene />
@@ -86,10 +83,12 @@ export default function LandingPage() {
                 </li>
                 <li className="flex gap-3">
                   <ShieldCheck size={18} className="mt-1 shrink-0 text-[#6f5cc1]" />
-                  <span>
-                    Each month&rsquo;s amount stays with our licensed banking partner for one month before it reaches your Pillar III.
-                    The interest from that month is how zile. stays free.{' '}
-                    <Link href="/terms" className="font-semibold text-[#5f4bb6] underline dark:text-[#a594f0]">
+                  <span className="flex flex-col">
+                    <span>
+                      Each month&rsquo;s amount stays with our licensed banking partner for one month before it reaches your Pillar
+                      III. The interest from that month is how LifeGrowth stays free.
+                    </span>
+                    <Link href="/terms" className="pulse-hover mt-3 inline-flex w-fit items-center gap-1.5 rounded-xl bg-[#f1effa] px-3.5 py-2 text-sm font-semibold text-[#5f4bb6] dark:bg-[#2b253a] dark:text-[#a594f0]">
                       Read the terms
                     </Link>
                   </span>

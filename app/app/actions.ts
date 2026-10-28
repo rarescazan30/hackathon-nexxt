@@ -10,9 +10,9 @@ import { getAppData } from '@/lib/data/app-data'
 import { lifestyleNumbers } from '@/lib/data/lifestyle-state'
 import { daysAtRetirement, levelState, XP_PER_DAY, STREAK_BONUS_XP } from '@/lib/rules'
 import { monthRange, rebuildJar } from '@/lib/server/jar'
-import { importMockMonth } from '@/lib/server/mock-bank'
+import { importBankHistory, importMockMonth } from '@/lib/server/mock-bank'
 import { answerOffer, collectJar, investJar, offerJar } from '@/lib/server/money-flow'
-import { ProfileDataInput, saveProfileData } from '@/lib/server/profile-data'
+import { BankChoice, ProfileDataInput, saveProfileData } from '@/lib/server/profile-data'
 import { unwrap } from '@/lib/server/unwrap'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
@@ -226,17 +226,24 @@ export async function createShareLink(formData: FormData): Promise<{ path: strin
   return { path: `/i/${code}` }
 }
 
-/** "Connect your card" from the app (demo bank): import this month's card payments so far. */
-export async function connectCard() {
+/**
+ * "Open Banking (demo)" from Profile: remember the bank and card, then the bank sends the
+ * last 3 months of payments plus this month so far (like a real PSD2 connection).
+ */
+export async function connectCard(choice: BankChoice) {
   const userId = await requireUserId()
+  const { bankName, cardLast4 } = BankChoice.parse(choice)
   const db = createAdminClient()
-  const profile = unwrap(await db.from('profiles').update({ card_linked: true }).eq('id', userId).select('net_salary_bani').single())
-
-  const latest = unwrap(await db.from('monthly_jars').select('month, status').eq('user_id', userId).order('month', { ascending: false }).limit(1))[0]
-  const now = new Date()
-  const month = latest?.month ?? now.toISOString().slice(0, 7)
-  const sameMonthAsToday = month === now.toISOString().slice(0, 7)
-  await importMockMonth(db, userId, month, profile.net_salary_bani ?? 0, { untilDay: sameMonthAsToday ? now.getUTCDate() : 31, includeSalary: false })
+  const profile = unwrap(
+    await db
+      .from('profiles')
+      .update({ card_linked: true, bank_name: bankName, bank_card_last4: cardLast4 })
+      .eq('id', userId)
+      .select('net_salary_bani')
+      .single(),
+  )
+  const latest = unwrap(await db.from('monthly_jars').select('month').eq('user_id', userId).order('month', { ascending: false }).limit(1))[0]
+  await importBankHistory(db, userId, latest?.month ?? new Date().toISOString().slice(0, 7), profile.net_salary_bani ?? 0)
   await rebuildOpenMonth(userId)
   refresh()
 }

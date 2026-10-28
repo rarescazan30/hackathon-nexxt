@@ -1,13 +1,33 @@
 // Loads everything the /app screens show, for the logged-in user (RLS does the filtering).
 // The screens get this object as props; they never fetch on their own.
 import { redirect } from 'next/navigation'
-import { daysAtRetirement, slotUnlockedAt, type LevelState, type RetirementIncome, type Slot } from '@/lib/rules'
+import { daysAtRetirement, roundUp, slotUnlockedAt, type LevelState, type RetirementIncome, type Slot } from '@/lib/rules'
 import { isAdminEmail } from '@/lib/server/admin'
 import { stripeIsConfigured } from '@/lib/server/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { lifestyleNumbers } from './lifestyle-state'
 
 const YEAR_MS = 365 * 86_400_000
+/** Months of payment history shown before the open month (what the bank sends: ~90 days). */
+const PAYMENT_HISTORY_MONTHS = 3
+
+/** '2026-10', -3 → '2026-07' */
+function addMonths(month: string, delta: number) {
+  const [year, monthNumber] = month.split('-').map(Number)
+  return new Date(Date.UTC(year, monthNumber - 1 + delta, 1)).toISOString().slice(0, 7)
+}
+
+export interface CardPayment {
+  id: string
+  month: string
+  date: string
+  counterparty: string
+  spentBani: number
+  /** The round-up this payment gives under the current rule. */
+  roundupBani: number
+  /** Paid before the user's first month in the app: shown as "what you could have saved". */
+  beforeJoining: boolean
+}
 
 export interface JarSummary {
   id: string
@@ -32,6 +52,8 @@ export interface AppData {
     roundupRuleBani: number
     salaryPercentBp: number
     cardLinked: boolean
+    /** Open Banking (demo): the bank and card the user connected. */
+    bank: { name: string; last4: string } | null
     /** The saved payment card (Stripe), e.g. { brand: 'visa', last4: '4242' }. */
     card: { brand: string; last4: string } | null
     /** Stripe test keys are set, so cards can be added and charged. */
@@ -44,7 +66,8 @@ export interface AppData {
   levelUp: { level: number; slot: Slot } | null
   /** The newest jar: this month's counter or offer. */
   currentJar: JarSummary | null
-  roundups: { id: string; date: string; counterparty: string; spentBani: number; roundupBani: number }[]
+  /** Card payments of the open month and the 3 before it, newest first. */
+  payments: CardPayment[]
   history: JarSummary[]
   pensions: { id: string; type: string; provider: string | null; balanceBani: number; asOf: string }[]
   /** The newest statement is over a year old: funds have sent a new one by now. */
@@ -97,22 +120,28 @@ export async function getAppData(): Promise<AppDataResult> {
   })
   const [current, ...past] = jars
 
-  // This month's round-ups with the payment they came from.
-  const { data: roundupRows } = current
-    ? await supabase
-        .from('roundups')
-        .select('id, amount_bani, transactions(booked_at, counterparty, amount_bani)')
-        .eq('month', current.month)
-    : { data: [] }
-  const roundups = (roundupRows ?? [])
-    .map((row) => ({
-      id: row.id,
-      date: row.transactions?.booked_at ?? '',
-      counterparty: row.transactions?.counterparty ?? 'Card payment',
-      spentBani: -(row.transactions?.amount_bani ?? 0),
-      roundupBani: row.amount_bani,
-    }))
-    .sort((a, b) => b.date.localeCompare(a.date))
+  // Card payments of the last few months (from the bank connection or a bank statement),
+  // each with the round-up it gives under today's rule. Only the open month's count for the
+  // piggy bank; older ones are history ("before LifeGrowth" when there was no month yet).
+  const openMonth = current?.month ?? new Date().toISOString().slice(0, 7)
+  const { data: paymentRows } = await supabase
+    .from('transactions')
+    .select('id, booked_at, counterparty, amount_bani')
+    .eq('is_card_payment', true)
+    .lt('amount_bani', 0)
+    .gte('booked_at', `${addMonths(openMonth, -PAYMENT_HISTORY_MONTHS)}-01`)
+    .lt('booked_at', `${addMonths(openMonth, 1)}-01`)
+    .order('booked_at', { ascending: false })
+  const firstMonth = jars.length > 0 ? jars[jars.length - 1].month : openMonth
+  const payments = (paymentRows ?? []).map((row) => ({
+    id: row.id,
+    month: row.booked_at.slice(0, 7),
+    date: row.booked_at,
+    counterparty: row.counterparty ?? 'Card payment',
+    spentBani: -row.amount_bani,
+    roundupBani: roundUp(-row.amount_bani, { stepBani: profile.roundup_rule_bani, multiplier: profile.roundup_multiplier }),
+    beforeJoining: row.booked_at.slice(0, 7) < firstMonth,
+  }))
 
   const fullName = profile.full_name ?? auth.user.email ?? 'there'
   const level = numbers.level.level
@@ -127,6 +156,7 @@ export async function getAppData(): Promise<AppDataResult> {
         roundupRuleBani: profile.roundup_rule_bani,
         salaryPercentBp: profile.salary_percent_bp,
         cardLinked: profile.card_linked,
+        bank: profile.card_linked && profile.bank_name && profile.bank_card_last4 ? { name: profile.bank_name, last4: profile.bank_card_last4 } : null,
         card: profile.card_last4 ? { brand: profile.card_brand ?? 'card', last4: profile.card_last4 } : null,
         cardPaymentsReady: stripeIsConfigured(),
       },
@@ -135,7 +165,7 @@ export async function getAppData(): Promise<AppDataResult> {
       level: numbers.level,
       levelUp: level > profile.last_seen_level ? { level, slot: slotUnlockedAt(level) } : null,
       currentJar: current ? toSummary(current) : null,
-      roundups,
+      payments,
       history: past.map(toSummary),
       pensions: assets.map((asset) => ({
         id: asset.id,

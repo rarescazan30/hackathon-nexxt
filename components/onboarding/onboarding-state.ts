@@ -1,5 +1,6 @@
 // What the onboarding screens collect, kept as typed text until the last step.
 import { profileError, type ProfileField } from '@/lib/rules/profile-limits'
+import type { BankChoice } from '@/lib/server/profile-data'
 
 export interface PensionDraft {
   key: string
@@ -19,6 +20,8 @@ export interface OnboardingDraft {
   roundupRuleBani: 0 | 100 | 500 | 1000
   salaryPercentBp: number
   cardLinked: boolean
+  /** The bank and card picked on the Open Banking (demo) screen. */
+  bank?: BankChoice
   termsAccepted: boolean
 }
 

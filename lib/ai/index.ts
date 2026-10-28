@@ -4,3 +4,4 @@
 export * from "./model";
 export * from "./monthly-message";
 export * from "./extract-statement";
+export * from "./extract-document";

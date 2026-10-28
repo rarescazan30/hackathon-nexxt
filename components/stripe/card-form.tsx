@@ -69,7 +69,7 @@ function CardFields({ onSaved }: { onSaved: () => void }) {
       <div>
         <span className={LIGHT_LABEL}>Card number</span>
         <div className={FIELD_BOX}>
-          <CardNumberElement options={{ ...ELEMENT_OPTIONS, showIcon: true }} />
+          <CardNumberElement options={{ ...ELEMENT_OPTIONS, showIcon: true, disableLink: true }} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">

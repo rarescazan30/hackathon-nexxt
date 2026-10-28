@@ -10,7 +10,8 @@ import { createShareLink } from '@/app/app/actions'
 // Link previews (WhatsApp, LinkedIn) use 1200×630 images.
 const PREVIEW_WIDTH = 1200
 const PREVIEW_HEIGHT = 630
-const SHARE_TEXT = 'This is how I will live in retirement. See yours on zile.'
+const SCENE_AREA_WIDTH = 640
+const SHARE_TEXT = 'This is how I will live in retirement. See yours on LifeGrowth'
 
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
@@ -24,9 +25,13 @@ function previewPicture(scene: HTMLCanvasElement, firstName: string, level: numb
 
   ctx.fillStyle = '#f1effa'
   ctx.fillRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT)
-  ctx.drawImage(scene, 20, 0, PREVIEW_HEIGHT, PREVIEW_HEIGHT) // the scene is square
+  // Fit the scene (square or 4:3) into the left 640 × 630 area, keeping its shape.
+  const scale = Math.min(SCENE_AREA_WIDTH / scene.width, PREVIEW_HEIGHT / scene.height)
+  const drawWidth = scene.width * scale
+  const drawHeight = scene.height * scale
+  ctx.drawImage(scene, (SCENE_AREA_WIDTH - drawWidth) / 2 + 10, (PREVIEW_HEIGHT - drawHeight) / 2, drawWidth, drawHeight)
 
-  const x = PREVIEW_HEIGHT + 40
+  const x = SCENE_AREA_WIDTH + 30
   ctx.fillStyle = '#8c7ad9'
   ctx.font = '600 26px Arial, sans-serif'
   ctx.fillText('MY RETIREMENT ISLAND', x, 210)
@@ -50,7 +55,7 @@ function previewPicture(scene: HTMLCanvasElement, firstName: string, level: numb
   ctx.fillText('Start saving for your pension', x, 480)
   ctx.fillStyle = '#33256c'
   ctx.font = '700 34px Arial, sans-serif'
-  ctx.fillText('zile.', x, 560)
+  ctx.fillText('LifeGrowth', x, 560)
 
   return new Promise((resolve) => card.toBlob(resolve, 'image/png'))
 }

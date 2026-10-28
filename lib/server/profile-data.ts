@@ -16,6 +16,13 @@ const PensionInput = z.object({
   uploadId: z.uuid().optional(),
 })
 
+/** What the user picked on the Open Banking (demo) screen: a bank and a card's last 4 digits. */
+export const BankChoice = z.object({
+  bankName: z.string().trim().min(2).max(40),
+  cardLast4: z.string().regex(/^\d{4}$/),
+})
+export type BankChoice = z.infer<typeof BankChoice>
+
 /** The fields both forms send. Use with `.superRefine(rejectOddProfile)`. */
 export const profileDataFields = {
   birthYear: z.number().int(),
