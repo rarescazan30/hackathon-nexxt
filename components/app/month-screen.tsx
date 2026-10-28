@@ -11,7 +11,8 @@ import { answerMonthlyOffer, simulateMonthEnd } from '@/app/app/actions'
 import { completeCardPayment, payMonthWithCard } from '@/app/app/card-actions'
 import { Card, Header } from '@/components/app/shell'
 import { PaymentHistory } from '@/components/app/payment-history'
-import { DemoBank } from '@/components/bank/demo-bank'
+import { Sheet } from '@/components/app/sheet'
+import { PRIMARY_BUTTON } from '@/components/onboarding/onboarding-state'
 import { getStripeJs } from '@/components/stripe/card-form'
 import { monthName, shortDate, type Tab } from '@/components/app/types'
 
@@ -19,7 +20,7 @@ const MAX_OFFER_MULTIPLE = 2
 
 type SavedCard = AppData['settings']['card']
 
-function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
+function OfferCard({ jar, card, cardPaymentsReady, openProfile }: { jar: JarSummary; card: SavedCard; cardPaymentsReady: boolean; openProfile: () => void }) {
   const [pending, startTransition] = useTransition()
   const [editing, setEditing] = useState(false)
   const [amountRon, setAmountRon] = useState(String(Math.round(jar.totalBani / 100)))
@@ -27,7 +28,7 @@ function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
   const amountBani = Math.round(Number(amountRon) * 100)
   const validAmount = amountBani > 0 && amountBani <= jar.totalBani * MAX_OFFER_MULTIPLE
 
-  const [confirming, setConfirming] = useState(false)
+  const [askingForCard, setAskingForCard] = useState(false)
   const [payError, setPayError] = useState<string>()
   const answer = (accept: boolean) =>
     startTransition(() => answerMonthlyOffer({ jarId: jar.id, accept, amountBani: accept && editing ? amountBani : undefined }))
@@ -48,16 +49,24 @@ function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
 
   return (
     <Card className="border-[#ddd4fa] !bg-[#faf8ff] dark:!bg-[#241e33]">
-      {confirming && (
-        <DemoBank
-          mode="payment"
-          amount={formatRon(editing ? amountBani : jar.totalBani, { wholeRon: true })}
-          onClose={() => setConfirming(false)}
-          onConfirm={() => {
-            setConfirming(false)
-            answer(true)
-          }}
-        />
+      {askingForCard && (
+        <Sheet eyebrow="Payment card" title="Add a card in Profile to pay" onClose={() => setAskingForCard(false)}>
+          <p className="text-sm leading-6 text-[#706b7b]">
+            Your monthly amount is paid with a card, through Stripe (test mode, no real money). Add one in{' '}
+            <b className="text-[#292431]">Profile → Card and bank</b>, then come back and say yes.
+          </p>
+          {!cardPaymentsReady && (
+            <p className="mt-3 rounded-xl bg-[#fff6e5] px-3.5 py-2.5 text-xs leading-5 text-[#8a5a00]">
+              Card payments are off on this server: the Stripe test keys are missing (docs/STRIPE_TESTING.md).
+            </p>
+          )}
+          <button onClick={openProfile} className={`${PRIMARY_BUTTON} mt-4`}>
+            Go to Profile
+          </button>
+          <button onClick={() => setAskingForCard(false)} className="mt-2 w-full py-2 text-sm font-semibold text-[#6b57bd]">
+            Not now
+          </button>
+        </Sheet>
       )}
       <p className="mb-3 text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]">{monthName(jar.month)} · end of month</p>
       <div className="flex items-start gap-3">
@@ -97,7 +106,7 @@ function OfferCard({ jar, card }: { jar: JarSummary; card: SavedCard }) {
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button
-          onClick={() => (card ? payByCard() : setConfirming(true))}
+          onClick={() => (card ? payByCard() : setAskingForCard(true))}
           disabled={pending || !validAmount}
           className="pulse-hover rounded-xl bg-[#33256c] px-3 py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
@@ -163,8 +172,8 @@ function ChangeLink({ onClick }: { onClick: () => void }) {
   )
 }
 
-function CurrentMonth({ jar, card, openSettings }: { jar: JarSummary; card: SavedCard; openSettings: () => void }) {
-  if (jar.status === 'offered') return <OfferCard jar={jar} card={card} />
+function CurrentMonth({ jar, settings, openSettings }: { jar: JarSummary; settings: AppData['settings']; openSettings: () => void }) {
+  if (jar.status === 'offered') return <OfferCard jar={jar} card={settings.card} cardPaymentsReady={settings.cardPaymentsReady} openProfile={openSettings} />
 
   const answered = jar.status !== 'open'
   const line = statusLine(jar)
@@ -205,7 +214,7 @@ export function MonthScreen({ data, setTab }: { data: AppData; setTab: (tab: Tab
     <div className="flex flex-col gap-4">
       <Header title="This month" subtitle="Your piggy bank" />
 
-      {currentJar ? <CurrentMonth jar={currentJar} card={data.settings.card} openSettings={() => setTab('profile')} /> : <Card>No activity yet.</Card>}
+      {currentJar ? <CurrentMonth jar={currentJar} settings={data.settings} openSettings={() => setTab('profile')} /> : <Card>No activity yet.</Card>}
       <SimulateButton />
 
       <PaymentHistory payments={data.payments} openMonth={currentJar?.month ?? null} connectBank={() => setTab('profile')} />

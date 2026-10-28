@@ -6,6 +6,7 @@ import { SLOTS, formatRatio, formatRon } from '@/lib/rules/lifestyle'
 import type { LifestyleNumbers } from '@/lib/data/lifestyle-state'
 import { Card } from '@/components/app/shell'
 import { CountUpFreedom } from '@/components/app/count-up-freedom'
+import { FitText } from '@/components/app/fit-text'
 import { LifestyleScene, SLOT_NAMES, slotLabel } from '@/components/scene'
 import { PRIMARY_BUTTON } from './onboarding-state'
 
@@ -31,19 +32,20 @@ export function RevealStep({ numbers, onNext }: { numbers: LifestyleNumbers; onN
       </Card>
 
       <Card className="flex flex-col gap-3 text-sm">
-        <div className="flex justify-between">
+        {/* The numbers never wrap: they shrink a little instead (FitText). */}
+        <div className="grid grid-cols-[minmax(8.5rem,1fr)_minmax(0,max-content)] items-baseline gap-3">
           <span className="text-[#706b7b] dark:text-[#aaa4b6]">Expected income at 65</span>
-          <b>{formatRon(income.totalMonthlyBani, { wholeRon: true })}/mo</b>
+          <FitText className="font-bold">{formatRon(income.totalMonthlyBani, { wholeRon: true })}/mo</FitText>
         </div>
-        <div className="flex justify-between">
+        <div className="grid grid-cols-[minmax(8.5rem,1fr)_minmax(0,max-content)] items-baseline gap-3">
           <span className="text-[#706b7b] dark:text-[#aaa4b6]">Compared to your life today</span>
-          <b>{formatRatio(income.replacementRatio)}</b>
+          <FitText className="font-bold">{formatRatio(income.replacementRatio)}</FitText>
         </div>
-        <div className="flex justify-between">
+        <div className="grid grid-cols-[minmax(8.5rem,1fr)_minmax(0,max-content)] items-baseline gap-3">
           <span className="text-[#706b7b] dark:text-[#aaa4b6]">Days of freedom your savings buy at 65</span>
-          <b>
+          <FitText className="font-bold">
             <CountUpFreedom days={totalDays} />
-          </b>
+          </FitText>
         </div>
         <p className="border-t border-dashed border-[#e2dfe8] pt-3 text-xs text-[#96909f] dark:border-[#353042]">
           Prices in Romania rose {INFLATION_10Y_RISE_PERCENT}% in the last 10 years, so we only count growth above inflation. In

@@ -9,7 +9,8 @@ What the jury should remember: **"In one minute I saw how I'll live in retiremen
 - [ ] Production build running: `npm run build && npm start` (+ `ngrok http 3000` if showing on phones).
 - [ ] Phone/laptop: open the landing page, **logged out**.
 - [ ] Files ready on the laptop: `data/demo/pillar2-statement-demo.pdf`, `data/demo/pillar3-statement-demo.pdf`, `data/demo/bank-statement-demo.pdf`.
-- [ ] Stripe Dashboard (test mode) open in a second tab → Payments.
+- [ ] Stripe Dashboard (test mode) open in a second tab → Payments. **Stripe keys are required:** "Yes, add it" needs a saved card.
+- [ ] Admin numbers filled: `npm run seed:demo-users` (338 fictional savers; `-- --remove` deletes them).
 - [ ] A fresh email ready for sign-up (e.g. `demo1@yourteam.ro`; each run needs a new one).
 
 **No working Gemini key?** Start the app with `AI_PROVIDER=mock`: uploads then use sample values tagged *"Sample values (AI is off in this demo)"*, picked by file name (demo PDFs work). Say it honestly if asked.
@@ -75,7 +76,7 @@ What the jury should remember: **"In one minute I saw how I'll live in retiremen
 |---|---|
 | A PDF isn't read | The manual card opens by itself: type the numbers from the PDF |
 | No bank connection wanted | Step 6: **Upload a bank statement** (`bank-statement-demo.pdf`) instead |
-| Stripe fails | Remove the card in Profile: "Yes" then uses the Open Banking confirmation |
+| Stripe fails | Say "Not this month" and show the Stripe Dashboard / admin panel instead. Without a saved card, "Yes" asks you to add one in Profile |
 | Sign-up blocked | Log in with the team's test user (made with `npm run seed`) |
 | Something breaks mid-demo | Admin view (`/admin`) shows the business numbers as a fallback story |
 

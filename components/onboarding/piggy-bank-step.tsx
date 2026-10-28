@@ -67,7 +67,6 @@ export function PiggyBankStep({ draft, update, onFinish, pending, error }: { dra
 
       {connecting && (
         <DemoBank
-          mode="consent"
           onClose={() => setConnecting(false)}
           onConfirm={(bank) => {
             setConnecting(false)

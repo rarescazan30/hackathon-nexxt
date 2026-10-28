@@ -12,7 +12,7 @@ const FALLBACK_AVERAGE_BANI = 50_000
 const MONTHS_PER_YEAR = 12
 
 export function RevenueProjection({ averageBani, acceptanceRate }: { averageBani: number; acceptanceRate: number }) {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(3) // 10,000 users
   const users = USER_STEPS[step]
   const average = averageBani || FALLBACK_AVERAGE_BANI
   const rate = acceptanceRate || 1

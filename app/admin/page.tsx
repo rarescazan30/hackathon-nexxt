@@ -1,4 +1,5 @@
-// /admin: company numbers (users, money held, interest earned, a revenue projection).
+// /admin: company numbers (revenue, money held, savers, money brought to Pillar III,
+// growth per month and a revenue projection).
 // Only for the admin account (ADMIN_EMAIL); anyone else gets a 404. Totals only.
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
@@ -6,12 +7,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { connection } from 'next/server'
 import { ArrowLeft } from 'lucide-react'
-import { getAdminStats } from '@/lib/data/admin-stats'
+import { getAdminStats, type MonthPoint } from '@/lib/data/admin-stats'
 import { FLOAT_INTEREST_RATE, formatRon } from '@/lib/rules'
 import { isAdminEmail } from '@/lib/server/admin'
 import { createClient } from '@/lib/supabase/server'
 import { Card, Logo } from '@/components/app/shell'
-import { monthName } from '@/components/app/types'
 import { RevenueProjection } from './revenue-projection'
 
 export const metadata: Metadata = {
@@ -39,14 +39,45 @@ export default function AdminPage() {
 
 const EYEBROW = 'text-xs font-medium uppercase tracking-[.18em] text-[#8c7ad9]'
 
-function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
+function Stat({ label, value, note, highlight = false }: { label: string; value: string; note?: string; highlight?: boolean }) {
   return (
-    <Card>
-      <p className={EYEBROW}>{label}</p>
-      <p className="mt-2 text-[28px] font-semibold tracking-[-.03em]">{value}</p>
-      {note && <p className="mt-1 text-xs text-[#858090] dark:text-[#a39cab]">{note}</p>}
+    <Card className={highlight ? '!bg-[#33256c] text-white dark:!bg-[#2a2147]' : ''}>
+      <p className={highlight ? 'text-xs font-medium uppercase tracking-[.18em] text-[#c9bff0]' : EYEBROW}>{label}</p>
+      <p className="mt-2 text-[28px] font-semibold tracking-[-.03em] tabular-nums">{value}</p>
+      {note && <p className={`mt-1 text-xs ${highlight ? 'text-[#d9d2f5]' : 'text-[#858090] dark:text-[#a39cab]'}`}>{note}</p>}
     </Card>
   )
+}
+
+/** A simple horizontal bar per month. */
+function BarChart({ title, points, format, empty }: { title: string; points: MonthPoint[]; format: (value: number) => string; empty?: string }) {
+  const max = Math.max(1, ...points.map((point) => point.value))
+  return (
+    <Card>
+      <p className={EYEBROW}>{title}</p>
+      {points.length === 0 ? (
+        <p className="mt-3 text-sm text-[#858090]">{empty ?? 'No data yet.'}</p>
+      ) : (
+        <ul className="mt-4 space-y-2">
+          {points.map((point) => (
+            <li key={point.month} className="grid grid-cols-[72px_1fr_96px] items-center gap-3 text-sm">
+              <span className="text-[#706b7b] dark:text-[#aaa4b6]">{shortMonth(point.month)}</span>
+              <span className="h-2.5 overflow-hidden rounded-full bg-[#f1effa] dark:bg-[#2b253a]">
+                <span className="block h-full rounded-full bg-[#6f5cc1]" style={{ width: `${(point.value / max) * 100}%` }} />
+              </span>
+              <b className="text-right tabular-nums">{format(point.value)}</b>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
+/** '2026-10' → 'Oct 2026' */
+function shortMonth(month: string) {
+  const [year, monthNumber] = month.split('-').map(Number)
+  return new Date(Date.UTC(year, monthNumber - 1, 1)).toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })
 }
 
 async function AdminDashboard() {
@@ -56,7 +87,6 @@ async function AdminDashboard() {
   if (!isAdminEmail(auth.user?.email)) notFound()
 
   const stats = await getAdminStats()
-  const maxMonth = Math.max(1, ...stats.interest.byMonth.map((row) => row.bani))
 
   return (
     <>
@@ -68,35 +98,27 @@ async function AdminDashboard() {
         </p>
       </header>
 
+      {/* The business in three numbers. */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Users" value={String(stats.users.registered)} note={`${stats.users.onboarded} finished onboarding · ${stats.users.cardLinked} with a card`} />
-        <Stat label="Money held now" value={formatRon(stats.heldNowBani, { wholeRon: true })} note="Accepted, not yet in Pillar III" />
-        <Stat label="Interest earned" value={formatRon(stats.interest.totalBani)} note={`${formatRon(stats.interest.thisMonthBani)} this month`} />
-        <Stat label="Contributions" value={String(stats.contributions.count)} note={`${formatRon(stats.contributions.totalBani, { wholeRon: true })} in total`} />
-        <Stat label="Average contribution" value={formatRon(stats.contributions.averageBani, { wholeRon: true })} note="per accepted month" />
-        <Stat label="Offers accepted" value={`${Math.round(stats.acceptanceRate * 100)}%`} note="of answered month-end offers" />
+        <Stat label="Revenue this month" value={formatRon(stats.interest.thisMonthBani, { wholeRon: true })} note={`${formatRon(stats.interest.totalBani, { wholeRon: true })} since launch`} highlight />
+        <Stat label="Annual run-rate" value={formatRon(stats.annualRunRateBani, { wholeRon: true })} note="this month × 12" highlight />
+        <Stat label="Money held now" value={formatRon(stats.heldNowBani, { wholeRon: true })} note="earning interest until it goes to Pillar III" highlight />
       </div>
 
-      <Card>
-        <p className={EYEBROW}>Interest per month</p>
-        {stats.interest.byMonth.length === 0 ? (
-          <p className="mt-3 text-sm text-[#858090]">No interest yet: it is earned when held money goes on to Pillar III.</p>
-        ) : (
-          <ul className="mt-4 space-y-2.5">
-            {stats.interest.byMonth.map((row) => (
-              <li key={row.month} className="grid grid-cols-[110px_1fr_90px] items-center gap-3 text-sm">
-                <span className="text-[#706b7b] dark:text-[#aaa4b6]">{monthName(row.month)}</span>
-                <span className="h-2.5 overflow-hidden rounded-full bg-[#f1effa] dark:bg-[#2b253a]">
-                  <span className="block h-full rounded-full bg-[#6f5cc1]" style={{ width: `${(row.bani / maxMonth) * 100}%` }} />
-                </span>
-                <b className="text-right tabular-nums">{formatRon(row.bani)}</b>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+      <div className="grid gap-4 sm:grid-cols-4">
+        <Stat label="Savers" value={stats.savers.toLocaleString('en-US')} note={`+${stats.newMembersThisMonth} new this month (+${Math.round(stats.memberGrowth * 100)}%) · ${stats.users.registered} accounts`} />
+        <Stat label="Brought to Pillar III" value={formatRon(stats.broughtToPillarThreeBani, { wholeRon: true })} note="all money added through us" />
+        <Stat label="Average month" value={formatRon(stats.averageContributionBani, { wholeRon: true })} note={`per saver · ${Math.round(stats.acceptanceRate * 100)}% of offers accepted`} />
+        <Stat label="Revenue per saver" value={formatRon(stats.revenuePerSaverYearBani, { wholeRon: true })} note="a year, at today's pace" />
+      </div>
 
-      <RevenueProjection averageBani={stats.contributions.averageBani} acceptanceRate={stats.acceptanceRate} />
+      <div className="grid gap-4 md:grid-cols-2">
+        <BarChart title="Members" points={stats.membersByMonth} format={(value) => value.toLocaleString('en-US')} />
+        <BarChart title="Money added per month" points={stats.contributionsByMonth} format={(value) => formatRon(value, { wholeRon: true })} />
+      </div>
+      <BarChart title="Revenue per month (interest)" points={stats.interest.byMonth} format={(value) => formatRon(value, { wholeRon: true })} empty="No interest yet: it is earned when held money goes on to Pillar III." />
+
+      <RevenueProjection averageBani={stats.averageContributionBani} acceptanceRate={stats.acceptanceRate} />
     </>
   )
 }

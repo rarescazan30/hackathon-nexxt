@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jiti lib/rules/__tests__/rules.test.ts && jiti lib/rules/__tests__/personas.test.ts && jiti lib/rules/__tests__/lifestyle.test.ts && jiti lib/ai/__tests__/ai.test.ts",
-    "seed": "jiti scripts/seed.ts"
+    "seed": "jiti scripts/seed.ts",
+    "seed:demo-users": "jiti scripts/seed-demo-users.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

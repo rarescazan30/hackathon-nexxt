@@ -30,7 +30,6 @@ export function PaymentSettings({ settings }: { settings: AppData['settings'] })
       {addingCard && <CardForm onClose={() => setAddingCard(false)} />}
       {connectingBank && (
         <DemoBank
-          mode="consent"
           onClose={() => setConnectingBank(false)}
           onConfirm={(choice) => {
             setConnectingBank(false)
