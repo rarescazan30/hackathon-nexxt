@@ -137,6 +137,9 @@ To allow multiple agents and developers to work in parallel without merge confli
 ## Agent Activity Log
 
 - **2026-10-28 13:15:** Added 4 disjoint tasks roadmap and AI logging rule to AGENTS.md. Files modified: `AGENTS.md`.
+- **2026-10-28 13:53:** Completed Task 3 (Dynamic Projections & Visualizations, CSS theme tokens, `ro-RO` formatting, `"Zile de libertate financiară dobândite"` & `"Money saved this month"` copy, transaction exclusion in monthly history, and shared reactive state across Home, Progress, and Profile settings including adjustable round-up steps/multipliers and salary percentage). Files modified: `app/globals.css`, `components/app/home-screen.tsx`, `components/app/progress-screen.tsx`, `components/app/profile-screen.tsx`, `AGENTS.md`.
+- **2026-10-28 14:04:** Replaced warm beige/peach/copper palette with cohesive indigo-lavender (`#eeebfa` light / `#262038` dark), sky-cyan (`#38bdf8` / `#0ea5e9`), and mint-teal (`#bfe8d1`) tokens across light and dark themes. Files modified: `app/globals.css`, `components/app/home-screen.tsx`, `AGENTS.md`.
+- **2026-10-28 14:12:** Updated `HomeAgentInvite` card and `PiggyBank` / `Wallet` badges with explicit violet-indigo light/dark surfaces (`#ede9fe`–`#ddd6fe` / `#2a2244`–`#1d1730`), and integrated realistic Romanian annual returns & interest rates (`ROMANIAN_INSTRUMENTS`: Fidelis/Tezaur 6,8%, Pilonul 3 7,9% ASF, Pilonul 2 8,1% ASF, ETF BET BVB 13,4%, Depozite RON 5,4% BNR, Inflație 4,0% BNR/INS) across `home-screen.tsx`, `progress-screen.tsx`, and `profile-screen.tsx`. Files modified: `components/app/home-screen.tsx`, `components/app/progress-screen.tsx`, `components/app/profile-screen.tsx`, `AGENTS.md`.
 * Branch from `main`: `feat/<area>-<short-name>` (e.g. `feat/rules-roundup`).
 * Small PRs (under ~300 lines), one feature each. Someone else reviews and merges.
 * Before opening a PR: `npm run lint` and `npm run build` pass.
