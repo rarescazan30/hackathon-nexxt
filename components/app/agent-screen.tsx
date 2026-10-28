@@ -15,6 +15,7 @@ import {
   User,
 } from 'lucide-react'
 import { Card, Header } from '@/components/app/shell'
+import { updateAppState } from '@/components/app/home-screen'
 import type { Chunk, RiskLevel } from '@/lib/contracts'
 import { formatBaniToLei, type RoundUpRule } from '@/lib/rules'
 import {
@@ -340,6 +341,18 @@ export function AgentScreen() {
       if (data.updatedContext) {
         setCtx(data.updatedContext)
         saveUserFinancialContext(data.updatedContext)
+
+        const rawStepLei = Math.round((data.updatedContext.roundUpRule.stepBani ?? 500) / 100)
+        const syncedStepLei: 0 | 1 | 5 | 10 =
+          rawStepLei >= 10 ? 10 : rawStepLei >= 5 ? 5 : rawStepLei >= 1 ? 1 : 5
+        const rawMult = data.updatedContext.roundUpRule.multiplier ?? 1
+        const syncedMult: 1 | 2 | 3 = rawMult >= 3 ? 3 : rawMult >= 2 ? 2 : 1
+
+        updateAppState({
+          risk: data.updatedContext.riskLevel,
+          roundUpStepLei: syncedStepLei,
+          roundUpMultiplier: syncedMult,
+        })
       }
 
       msgCounterRef.current += 1
