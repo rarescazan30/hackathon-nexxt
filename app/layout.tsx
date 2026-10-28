@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'zile. — Zile de libertate',
-  description: 'Pași mici azi. Mai multă libertate mâine.',
+  title: 'zile. — How will you live in retirement?',
+  description: 'Round up your card payments, grow your Pillar III pension, and see how you will live in retirement.',
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="ro">
+    <html lang="en">
       <body className="antialiased">{children}</body>
     </html>
   )

@@ -6,4 +6,5 @@ export * from "./roundup";
 export * from "./allocation";
 export * from "./projection";
 export * from "./freedom";
-
+export * from "./lifestyle";
+export * from "./float";

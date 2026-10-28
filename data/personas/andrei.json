@@ -1,10 +1,12 @@
 {
   "id": "andrei",
   "name": "Andrei",
-  "age": 26,
-  "yearsWorked": 3,
-  "salaryBani": 450000,
-  "pillarTwoBani": 820000,
+  "age": 34,
+  "yearsWorked": 12,
+  "salaryBani": 650000,
+  "pillarTwoBani": 4200000,
+  "pillarThreeBani": 0,
+  "expectedStartTier": 3,
   "risk": "medium",
   "roundUpRule": {
     "stepBani": 500,
@@ -12,9 +14,9 @@
   },
   "monthlyCapBani": 30000,
   "expectedDaysOfFreedom": {
-    "pessimistic": 290,
-    "base": 326,
-    "optimistic": 370
+    "pessimistic": 1029,
+    "base": 1156,
+    "optimistic": 1311
   },
   "sampleTransactions": [
     {
@@ -57,11 +59,11 @@
       "transactionId": "tx-andrei-004",
       "bookingDate": "2026-10-15",
       "transactionAmount": {
-        "amount": "4500.00",
+        "amount": "6500.00",
         "currency": "RON"
       },
       "creditorName": "Tech Solutions SRL",
-      "remittanceInformationUnstructured": "Salariu Octombrie 2026",
+      "remittanceInformationUnstructured": "Salary October 2026",
       "expectedSpentBani": 0,
       "expectedRoundUpBani": 0
     }

@@ -20,7 +20,7 @@ bank-statement extraction, explanations of numbers.
 - Answers about rules or products cite sources returned by `lib/rag/`.
 - No investment advice: offer scenarios, let the user choose; when unsure, say so and
   suggest talking to a bank advisor.
-- Answer in Romanian by default.
+- Answer in English (all app text is English).
 - Only mock data goes into prompts (free tiers may use prompts for training).
 - Cache answers for the demo persona so the live demo doesn't depend on rate limits.
 

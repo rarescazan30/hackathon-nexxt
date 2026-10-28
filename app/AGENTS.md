@@ -18,7 +18,7 @@ Pages and layouts of the mobile-first app. Backend code lives in `app/api/` (sep
   Never invent your own data shapes; while the backend isn't ready, import mock data
   from `data/mock/` that matches the contract.
 - Reusable pieces go in `components/`; pages stay thin.
-- Text in Romanian by default; keep strings easy to translate to English.
+- **All app text in English** (UI, errors, AI messages). Money as `169 RON`, `en` number format.
 
 ## Current state: the v0 prototype
 
@@ -41,7 +41,7 @@ Shared pieces (`Card`, `Header`, `BottomNav`, `Logo`) live in `components/app/sh
 - Colors are inline hex values (`#33256c`, `#8c7ad9`…). Move them to theme tokens in
   `app/globals.css` so the palette lives in one place.
 - The dark-mode toggle in Profil only flips its own switch; it doesn't change the theme yet.
-- Some mock labels in `data/mock/ui.ts` are in English; the UI should be Romanian.
+- The older screens still have Romanian copy; they are replaced in plan v2 (`docs/plan.md`).
 - The projection chart is a hard-coded SVG; replace it with real data from `lib/rules/`.
 - Chat, buttons and the slider are visual only. No API calls yet.
 - No onboarding flow yet (planned: bank connect, Pillar 2 upload, risk questions, rules).
