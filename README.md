@@ -33,7 +33,7 @@ Every contribution adds **days of freedom** and XP, and levels upgrade the islan
 
 ## Demo
 
-**▶ [Watch the demo video](202610290202.mp4)** (MP4, about 39 MB): a walkthrough of LifeGrowth in use.
+**▶ [Watch the demo video](https://drive.google.com/file/d/1xUv6h8t4mCRzRxVNbeAdPzcL4_i_gMaa/view?usp=drive_link)** (MP4, about 39 MB): a walkthrough of LifeGrowth in use.
 
 If the video doesn't play in the browser, open it and click **Download** (or *View raw*).
 
