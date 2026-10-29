@@ -1,0 +1,74 @@
+.hero {
+  padding: 4.5rem 1rem 3.5rem;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(111, 92, 193, 0.14), transparent);
+}
+
+.logo {
+  width: 72px;
+  height: 72px;
+}
+
+.title {
+  margin: 1rem 0 0.5rem;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: 1.15rem;
+  opacity: 0.8;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  padding: 2.5rem 0 4rem;
+}
+
+.card {
+  display: block;
+  padding: 1.4rem;
+  border-radius: 20px;
+  border: 1px solid var(--lg-card-border);
+  background: var(--lg-card);
+  color: inherit;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card:hover {
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(49, 37, 108, 0.12);
+}
+
+.cardLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+}
+
+.cardTitle {
+  margin: 0.35rem 0;
+  font-size: 1.2rem;
+}
+
+.cardText {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.8;
+}

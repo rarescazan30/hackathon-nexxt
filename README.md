@@ -300,6 +300,7 @@ All financial calculations are plain, tested code in `lib/rules/`, never the mod
 
 | Doc | About |
 |---|---|
+| [docs-site/](docs-site) | **the code documentation site** (Docusaurus): guide, architecture, features, reference, business. Run with `cd docs-site && npm install && npm start` |
 | [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) | the 4-minute demo, step by step |
 | [docs/plan.md](docs/plan.md) | product plan: numbers, money flow, screens |
 | [docs/architecture.md](docs/architecture.md) | how the pieces fit |

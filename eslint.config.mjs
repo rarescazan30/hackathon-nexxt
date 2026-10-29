@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The documentation site is its own Docusaurus project.
+    "docs-site/**",
   ]),
 ]);
 
