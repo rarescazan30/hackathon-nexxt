@@ -14,7 +14,6 @@ Every contribution adds **days of freedom** and XP, and levels upgrade the islan
 
 ## Contents
 
-▶ [Demo video](#demo)
 
 1. [Try it live (5 minutes)](#1-try-it-live-5-minutes)
 2. [Sample inputs](#2-sample-inputs)
@@ -29,15 +28,6 @@ Every contribution adds **days of freedom** and XP, and levels upgrade the islan
 11. [Limitations and honesty notes](#11-limitations-and-honesty-notes)
 12. [Further docs](#12-further-docs)
 
----
-
-## Demo
-
-**▶ [Watch the demo video](https://drive.google.com/file/d/1xUv6h8t4mCRzRxVNbeAdPzcL4_i_gMaa/view?usp=drive_link)** (MP4, about 39 MB): a walkthrough of LifeGrowth in use.
-
-If the video doesn't play in the browser, open it and click **Download** (or *View raw*).
-
-Pitch deck: [Life-Growth-334Supremacy-v3.pptx](Life-Growth-334Supremacy-v3.pptx).
 
 ---
 
